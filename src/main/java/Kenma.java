@@ -24,74 +24,75 @@ public class Kenma {
 
         Scanner sc = new Scanner(System.in);
         while (true) {
-            String input = sc.nextLine().trim();
-            if (input.equalsIgnoreCase("bye")) {
-                System.out.println(LINE);
-                System.out.println(" Bye. Hope to see you again soon!");
-                System.out.println(LINE);
-                break;
-            } else if (input.equalsIgnoreCase("list")) {
-                System.out.println(LINE);
-                System.out.println(" Here are the tasks in your list:");
-                for (int i = 0; i < size; i++) {
-                    System.out.printf(" %d.%s%n", i + 1, tasks[i]);
-                }
-                System.out.println(LINE);
-            } else if (input.startsWith("mark ")) {
-                int idx = parseIndex(input.substring(5));
-                if (valid(idx, size)) {
+            try {
+                String input = sc.nextLine().trim();
+                if (input.equalsIgnoreCase("bye")) {
+                    System.out.println(LINE);
+                    System.out.println(" Bye. Hope to see you again soon!");
+                    System.out.println(LINE);
+                    break;
+                } else if (input.equalsIgnoreCase("list")) {
+                    System.out.println(LINE);
+                    if (size == 0) {
+                        System.out.println(" No tasks in your list.");
+                    } else {
+                        System.out.println(" Here are the tasks in your list:");
+                        for (int i = 0; i < size; i++) {
+                            System.out.printf(" %d.%s%n", i + 1, tasks[i]);
+                        }
+                    }
+                    System.out.println(LINE);
+                } else if (input.startsWith("mark ")) {
+                    int idx = parseIndex(input.substring(5));
+                    if (!valid(idx, size)) throw new DukeException("Invalid task number to mark.");
                     tasks[idx - 1].markAsDone();
                     System.out.println(LINE);
                     System.out.println(" Nice! I've marked this task as done:");
                     System.out.println("   " + tasks[idx - 1]);
                     System.out.println(LINE);
-                }
-            } else if (input.startsWith("unmark ")) {
-                int idx = parseIndex(input.substring(7));
-                if (valid(idx, size)) {
+                } else if (input.startsWith("unmark ")) {
+                    int idx = parseIndex(input.substring(7));
+                    if (!valid(idx, size)) throw new DukeException("Invalid task number to unmark.");
                     tasks[idx - 1].markAsNotDone();
                     System.out.println(LINE);
                     System.out.println(" OK, I've marked this task as not done yet:");
                     System.out.println("   " + tasks[idx - 1]);
                     System.out.println(LINE);
-                }
-            } else if (input.startsWith("todo ")) {
-                String desc = input.substring(5).trim();
-                if (desc.isEmpty()) { continue; }
-                if (size < tasks.length) {
+                } else if (input.startsWith("todo")) {
+                    String desc = input.length() > 4 ? input.substring(5).trim() : "";
+                    if (desc.isEmpty()) throw new DukeException("The description of a todo cannot be empty.");
                     tasks[size++] = new Todo(desc);
                     added(tasks[size - 1], size);
-                }
-            } else if (input.startsWith("deadline ")) {
-                String body = input.substring(9).trim();
-                int idx = body.indexOf("/by");
-                if (idx == -1) { continue; }
-                String desc = body.substring(0, idx).trim();
-                String by   = body.substring(idx + 3).trim(); // 跳过 "/by"
-                if (desc.isEmpty() || by.isEmpty()) { continue; }
-                if (size < tasks.length) {
+                } else if (input.startsWith("deadline")) {
+                    String body = input.substring(9).trim();
+                    int idx = body.indexOf("/by");
+                    if (idx == -1) {
+                        throw new DukeException("Missing '/by'. Usage: deadline <desc> /by <when>");
+                    }
+                    String desc = body.substring(0, idx).trim();
+                    String by = body.substring(idx + 3).trim();
+                    if (desc.isEmpty() || by.isEmpty()) {
+                        throw new DukeException("Both description and '/by <when>' are required.");
+                    }
                     tasks[size++] = new Deadline(desc, by);
                     added(tasks[size - 1], size);
-                }
-            } else if (input.startsWith("event ")) {
-                String body = input.substring(6).trim(); // 去掉 "event "
-                String[] parts = body.split("/from|/to"); // 按关键字分割
-
-                if (parts.length >= 3) {
+                } else if (input.startsWith("event")) {
+                    String body = input.length() > 5 ? input.substring(6).trim() : "";
+                    String[] parts = body.split("/from|/to");
+                    if (parts.length < 3) throw new DukeException("Event must have description, /from and /to.");
                     String desc = parts[0].trim();
                     String from = parts[1].trim();
-                    String to   = parts[2].trim();
-
-                    if (!desc.isEmpty() && !from.isEmpty() && !to.isEmpty() && size < tasks.length) {
-                        tasks[size++] = new Event(desc, from, to);
-                        added(tasks[size - 1], size);
-                    }
-                }
-            } else if (!input.isEmpty()) {
-                if (size < tasks.length) {
-                    tasks[size++] = new Todo(input);
+                    String to = parts[2].trim();
+                    if (desc.isEmpty() || from.isEmpty() || to.isEmpty()) throw new DukeException("Event requires description, from and to.");
+                    tasks[size++] = new Event(desc, from, to);
                     added(tasks[size - 1], size);
+                } else {
+                    throw new DukeException("I'm sorry, but I don't know what that means :-(");
                 }
+            } catch (DukeException e) {
+                System.out.println(LINE);
+                System.out.println(" " + e.getMessage());
+                System.out.println(LINE);
             }
         }
     }
