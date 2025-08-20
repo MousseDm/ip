@@ -64,11 +64,10 @@ public class Kenma {
                 }
             } else if (input.startsWith("deadline ")) {
                 String body = input.substring(9).trim();
-                int split = body.indexOf(" /by ");
-                if (split == -1) split = body.indexOf("/by ");
-                if (split == -1) { continue; }
-                String desc = body.substring(0, split).trim();
-                String by   = body.substring(split).replaceFirst("^/?by\\s+", "").trim();
+                int idx = body.indexOf("/by");
+                if (idx == -1) { continue; }
+                String desc = body.substring(0, idx).trim();
+                String by   = body.substring(idx + 3).trim(); // 跳过 "/by"
                 if (desc.isEmpty() || by.isEmpty()) { continue; }
                 if (size < tasks.length) {
                     tasks[size++] = new Deadline(desc, by);
