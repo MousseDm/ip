@@ -10,25 +10,39 @@ public class Kenma {
                         + "| . \\ | |____| |\\  | |  | |/ ____ \\\n"
                         + "|_|\\_\\|______|_| \\_|_|  |_/_/    \\_\\\n";
 
+        String LINE = "____________________________________________________________";
         System.out.println(logo);
-        System.out.println("____________________________________________________________");
+        System.out.println(LINE);
         System.out.println(" Hello! I'm Kenma");
         System.out.println(" What can I do for you?");
 
-        System.out.println("____________________________________________________________");
+        System.out.println(LINE);
+
+        String[] tasks = new String[100];
+        int size = 0;
 
         Scanner sc = new Scanner(System.in);
         while (true) {
-            String input = sc.nextLine();
+            String input = sc.nextLine().trim();
             if (input.equalsIgnoreCase("bye")) {
-                System.out.println("____________________________________________________________");
+                System.out.println(LINE);
                 System.out.println(" Bye. Hope to see you again soon!");
-                System.out.println("____________________________________________________________");
-                break; // 退出循环，结束程序
-            } else {
-                System.out.println("____________________________________________________________");
-                System.out.println(" " + input);
-                System.out.println("____________________________________________________________");
+                System.out.println(LINE);
+                break;
+            } else if (input.equalsIgnoreCase("list")) {
+                System.out.println(LINE);
+                for (int i = 0; i < size; i++) {
+                    System.out.printf(" %d. %s%n", i + 1, tasks[i]);
+                }
+                if (size == 0) {
+                    System.out.println("Currently no tasks");
+                }
+                System.out.println(LINE);
+            } else if (!input.isEmpty()) {
+                tasks[size++] = input;
+                System.out.println(LINE);
+                System.out.println(" added: " + input);
+                System.out.println(LINE);
             }
         }
     }
