@@ -18,7 +18,7 @@ public class Kenma {
 
         System.out.println(LINE);
 
-        String[] tasks = new String[100];
+        Task[] tasks = new Task[100];
         int size = 0;
 
         Scanner sc = new Scanner(System.in);
@@ -31,15 +31,33 @@ public class Kenma {
                 break;
             } else if (input.equalsIgnoreCase("list")) {
                 System.out.println(LINE);
+                System.out.println(" Here are the tasks in your list:");
                 for (int i = 0; i < size; i++) {
-                    System.out.printf(" %d. %s%n", i + 1, tasks[i]);
-                }
-                if (size == 0) {
-                    System.out.println("Currently no tasks");
+                    System.out.printf(" %d.%s%n", i + 1, tasks[i]);
                 }
                 System.out.println(LINE);
+            } else if (input.startsWith("mark ")) {
+                int index = Integer.parseInt(input.substring(5)) - 1;
+                if (index >= 0 && index < size) {
+                    tasks[index].markAsDone();
+                    System.out.println(LINE);
+                    System.out.println(" Nice! I've marked this task as done:");
+                    System.out.println("   " + tasks[index]);
+                    System.out.println(LINE);
+                }
+
+            } else if (input.startsWith("unmark ")) {
+                int index = Integer.parseInt(input.substring(7)) - 1;
+                if (index >= 0 && index < size) {
+                    tasks[index].markAsNotDone();
+                    System.out.println(LINE);
+                    System.out.println(" OK, I've marked this task as not done yet:");
+                    System.out.println("   " + tasks[index]);
+                    System.out.println(LINE);
+                }
+
             } else if (!input.isEmpty()) {
-                tasks[size++] = input;
+                tasks[size++] = new Task(input);
                 System.out.println(LINE);
                 System.out.println(" added: " + input);
                 System.out.println(LINE);
