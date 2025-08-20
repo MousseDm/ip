@@ -10,4 +10,7 @@ mark 5
 unmark 1
 unmark 10
 blah
+delete 2
+delete 99
+list
 bye
