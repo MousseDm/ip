@@ -3,3 +3,7 @@ D | 0 | return book | June 6th
 E | 0 | project meeting | Aug 6th 2-4pm
 T | 1 | join sports club
 E | 0 | cca | 7pm | 9pm
+D | 0 | return book | 2019-12-02
+D | 0 | submit report | 2019-12-02 1800
+E | 0 | project meeting | 2019-12-02 | 2019-12-03
+E | 0 | seminar | 2019-12-02 1800 | 2019-12-02 2000

@@ -8,6 +8,10 @@ import java.nio.file.Paths;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
 public class Kenma {
     private static final String LINE =
             "____________________________________________________________";
@@ -123,6 +127,9 @@ public class Kenma {
                     added(tasks.get(tasks.size() - 1), tasks.size());
                     trySave(tasks);
 
+                } else if (input.startsWith("on ")) {
+                    String dateStr = input.substring(3).trim();
+                    handleOnCommand(tasks, dateStr);
                 } else {
                     throw new DukeException("I'm sorry, but I don't know what that means :-(");
                 }
@@ -234,6 +241,38 @@ public class Kenma {
         System.out.println(" Got it. I've added this task:");
         System.out.println("   " + t);
         System.out.println(" Now you have " + count + " tasks in the list.");
+        System.out.println(LINE);
+    }
+
+    private static void handleOnCommand(ArrayList<Task> tasks, String dateStr) {
+        System.out.println(LINE);
+        try {
+            java.time.LocalDate target = java.time.LocalDate.parse(
+                    dateStr, java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            boolean found = false;
+            System.out.println(" Tasks on " + target + ":");
+            for (int i = 0; i < tasks.size(); i++) {
+                Task t = tasks.get(i);
+                if (t instanceof Deadline) {
+                    Deadline d = (Deadline) t;
+                    if (d.occursOn(target)) {
+                        System.out.printf(" %d.%s%n", i + 1, d);
+                        found = true;
+                    }
+                } else if (t instanceof Event) {
+                    Event e = (Event) t;
+                    if (e.occursOn(target)) {
+                        System.out.printf(" %d.%s%n", i + 1, e);
+                        found = true;
+                    }
+                }
+            }
+            if (!found) {
+                System.out.println(" No tasks on this date.");
+            }
+        } catch (java.time.format.DateTimeParseException e) {
+            System.out.println(" Please provide a valid date in yyyy-MM-dd format.");
+        }
         System.out.println(LINE);
     }
 }
