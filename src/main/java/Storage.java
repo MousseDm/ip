@@ -1,0 +1,88 @@
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.*;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Storage {
+    private final Path file;
+
+    public Storage(String filePath) {
+        this.file = Paths.get(filePath);
+    }
+
+    public List<Task> load() throws IOException {
+        if (!Files.exists(file)) return new ArrayList<>();
+        List<String> lines = Files.readAllLines(file);
+        List<Task> tasks = new ArrayList<>();
+        for (String line : lines) {
+            Task t = decode(line);
+            if (t != null) tasks.add(t);
+        }
+        return tasks;
+    }
+
+    public void save(List<Task> tasks) throws IOException {
+        Files.createDirectories(file.getParent());
+        try (BufferedWriter bw = Files.newBufferedWriter(file)) {
+            for (Task t : tasks) {
+                String s = encode(t);
+                if (s != null) {
+                    bw.write(s);
+                    bw.newLine();
+                }
+            }
+        }
+    }
+
+    private Task decode(String line) {
+        String[] p = Arrays.stream(line.split("\\|")).map(String::trim).toArray(String[]::new);
+        if (p.length < 3) return null;
+        String type = p[0];
+        boolean isDone = "1".equals(p[1]);
+        String desc = p[2];
+        try {
+            switch (type) {
+                case "T": {
+                    Todo t = new Todo(desc);
+                    if (isDone) t.markAsDone();
+                    return t;
+                }
+                case "D": {
+                    if (p.length < 4) return null;
+                    Deadline d = new Deadline(desc, p[3]);
+                    if (isDone) d.markAsDone();
+                    return d;
+                }
+                case "E": {
+                    if (p.length == 4) {
+                        Event e = new Event(desc, p[3], "");
+                        if (isDone) e.markAsDone();
+                        return e;
+                    } else if (p.length >= 5) {
+                        Event e = new Event(desc, p[3], p[4]);
+                        if (isDone) e.markAsDone();
+                        return e;
+                    } else return null;
+                }
+                default: return null;
+            }
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    private String encode(Task t) {
+        String flag = t.isDone ? "1" : "0";
+        if (t instanceof Todo) {
+            return "T | " + flag + " | " + t.description;
+        } else if (t instanceof Deadline) {
+            return "D | " + flag + " | " + t.description + " | " + ((Deadline) t).by;
+        } else if (t instanceof Event) {
+            Event e = (Event) t;
+            if (e.to == null || e.to.isEmpty())
+                return "E | " + flag + " | " + e.description + " | " + e.from;
+            return "E | " + flag + " | " + e.description + " | " + e.from + " | " + e.to;
+        } else return null;
+    }
+}
