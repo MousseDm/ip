@@ -9,23 +9,24 @@ import java.util.Locale;
 /**
  * Represents a task that must be completed by a specific time.
  *
- * <p>The {@code by} value supports:
+ * <p>
+ * The {@code by} value supports:
  * <ul>
- *   <li>{@code yyyy-MM-dd HHmm} (e.g., {@code 2025-08-21 2359})</li>
- *   <li>{@code yyyy-MM-dd} (date only)</li>
- *   <li>Any arbitrary string (kept verbatim if parsing fails)</li>
+ * <li>{@code yyyy-MM-dd HHmm} (e.g., {@code 2025-08-21 2359})</li>
+ * <li>{@code yyyy-MM-dd} (date only)</li>
+ * <li>Any arbitrary string (kept verbatim if parsing fails)</li>
  * </ul>
- * If parsing succeeds, a pretty-printed date/time is shown in {@link #toString()}.
+ * If parsing succeeds, a pretty-printed date/time is shown in
+ * {@link #toString()}.
  */
 public class Deadline extends Task {
     protected String by;
     private LocalDate date;
     private LocalDateTime dateTime;
 
-    private static final DateTimeFormatter FMT_DATE =
-            DateTimeFormatter.ofPattern("MMM d yyyy", Locale.ENGLISH);
-    private static final DateTimeFormatter FMT_DATETIME =
-            DateTimeFormatter.ofPattern("MMM d yyyy HH:mm", Locale.ENGLISH);
+    private static final DateTimeFormatter FMT_DATE = DateTimeFormatter.ofPattern("MMM d yyyy", Locale.ENGLISH);
+    private static final DateTimeFormatter FMT_DATETIME = DateTimeFormatter.ofPattern("MMM d yyyy HH:mm",
+            Locale.ENGLISH);
 
     /**
      * Creates a deadline task.
@@ -40,8 +41,10 @@ public class Deadline extends Task {
     }
 
     /**
-     * Attempts to parse the raw {@code by} string into either a {@link LocalDateTime} or a {@link LocalDate}.
-     * If both attempts fail, both parsed fields remain {@code null} and the original string is kept.
+     * Attempts to parse the raw {@code by} string into either a
+     * {@link LocalDateTime} or a {@link LocalDate}.
+     * If both attempts fail, both parsed fields remain {@code null} and the
+     * original string is kept.
      *
      * @param s raw input to parse
      */
@@ -66,7 +69,8 @@ public class Deadline extends Task {
     }
 
     /**
-     * Returns a human-friendly representation of the due time, preferring the parsed date/time.
+     * Returns a human-friendly representation of the due time, preferring the
+     * parsed date/time.
      *
      * @return pretty-printed due time text
      */
@@ -83,10 +87,13 @@ public class Deadline extends Task {
     /**
      * Returns whether this deadline falls on the given calendar date.
      *
-     * <p>If the deadline was parsed as a datetime, only the date component is compared.
+     * <p>
+     * If the deadline was parsed as a datetime, only the date component is
+     * compared.
      *
      * @param target target calendar date
-     * @return {@code true} if this deadline occurs on {@code target}; otherwise {@code false}
+     * @return {@code true} if this deadline occurs on {@code target}; otherwise
+     *         {@code false}
      */
     public boolean occursOn(LocalDate target) {
         if (this.dateTime != null) {
@@ -99,7 +106,8 @@ public class Deadline extends Task {
     }
 
     /**
-     * Returns the string representation of this deadline, including its type symbol and pretty time.
+     * Returns the string representation of this deadline, including its type symbol
+     * and pretty time.
      *
      * @return string representation of this deadline
      */

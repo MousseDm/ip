@@ -7,11 +7,12 @@ import java.time.format.DateTimeParseException;
 /**
  * Entry point and top-level coordinator of the Kenma/Duke application.
  *
- * <p>Responsibilities:
+ * <p>
+ * Responsibilities:
  * <ul>
- *   <li>Initialize UI, storage, and task list</li>
- *   <li>Run the REPL loop to read/parse/execute commands</li>
- *   <li>Persist changes to disk</li>
+ * <li>Initialize UI, storage, and task list</li>
+ * <li>Run the REPL loop to read/parse/execute commands</li>
+ * <li>Persist changes to disk</li>
  * </ul>
  */
 public class Kenma {
@@ -42,13 +43,12 @@ public class Kenma {
      * Terminates when a {@code bye} command is received or on EOF.
      */
     private void run() {
-        String logo =
-                " _  __ ______ _   _ __  __       \n"
-                        + "| |/ /|  ____| \\ | |  \\/  |   /\\ \n"
-                        + "| ' / | |__  |  \\| | \\  / |  /  \\ \n"
-                        + "|  <  |  __| | . ` | |\\/| | / /\\ \\\n"
-                        + "| . \\ | |____| |\\  | |  | |/ ____ \\\n"
-                        + "|_|\\_\\|______|_| \\_|_|  |_/_/    \\_\\\n";
+        String logo = " _  __ ______ _   _ __  __       \n"
+                + "| |/ /|  ____| \\ | |  \\/  |   /\\ \n"
+                + "| ' / | |__  |  \\| | \\  / |  /  \\ \n"
+                + "|  <  |  __| | . ` | |\\/| | / /\\ \\\n"
+                + "| . \\ | |____| |\\  | |  | |/ ____ \\\n"
+                + "|_|\\_\\|______|_| \\_|_|  |_/_/    \\_\\\n";
         ui.showWelcome(logo);
 
         while (true) {
@@ -63,60 +63,60 @@ public class Kenma {
             try {
                 Parser.Parsed p = Parser.parse(input);
                 switch (p.cmd) {
-                case BYE:
-                    ui.showBye();
-                    return;
-                case LIST:
-                    ui.showList(tasks.all());
-                    break;
-                case MARK: {
-                    int idx = requireValidIndex(p.a, tasks.size());
-                    tasks.get(idx).markAsDone();
-                    ui.showMarked(tasks.get(idx));
-                    trySave();
-                    break;
-                }
-                case UNMARK: {
-                    int idx = requireValidIndex(p.a, tasks.size());
-                    tasks.get(idx).markAsNotDone();
-                    ui.showUnmarked(tasks.get(idx));
-                    trySave();
-                    break;
-                }
-                case DELETE: {
-                    int idx = requireValidIndex(p.a, tasks.size());
-                    Task removed = tasks.remove(idx);
-                    ui.showDeleted(removed, tasks.size());
-                    trySave();
-                    break;
-                }
-                case TODO: {
-                    Task t = new Todo(p.a);
-                    tasks.add(t);
-                    ui.showAdded(t, tasks.size());
-                    trySave();
-                    break;
-                }
-                case DEADLINE: {
-                    Task t = new Deadline(p.a, p.b);
-                    tasks.add(t);
-                    ui.showAdded(t, tasks.size());
-                    trySave();
-                    break;
-                }
-                case EVENT: {
-                    Task t = new Event(p.a, p.b, p.c);
-                    tasks.add(t);
-                    ui.showAdded(t, tasks.size());
-                    trySave();
-                    break;
-                }
-                case ON: {
-                    handleOn(p.a);
-                    break;
-                }
-                default:
-                    // unreachable
+                    case BYE:
+                        ui.showBye();
+                        return;
+                    case LIST:
+                        ui.showList(tasks.all());
+                        break;
+                    case MARK: {
+                        int idx = requireValidIndex(p.a, tasks.size());
+                        tasks.get(idx).markAsDone();
+                        ui.showMarked(tasks.get(idx));
+                        trySave();
+                        break;
+                    }
+                    case UNMARK: {
+                        int idx = requireValidIndex(p.a, tasks.size());
+                        tasks.get(idx).markAsNotDone();
+                        ui.showUnmarked(tasks.get(idx));
+                        trySave();
+                        break;
+                    }
+                    case DELETE: {
+                        int idx = requireValidIndex(p.a, tasks.size());
+                        Task removed = tasks.remove(idx);
+                        ui.showDeleted(removed, tasks.size());
+                        trySave();
+                        break;
+                    }
+                    case TODO: {
+                        Task t = new Todo(p.a);
+                        tasks.add(t);
+                        ui.showAdded(t, tasks.size());
+                        trySave();
+                        break;
+                    }
+                    case DEADLINE: {
+                        Task t = new Deadline(p.a, p.b);
+                        tasks.add(t);
+                        ui.showAdded(t, tasks.size());
+                        trySave();
+                        break;
+                    }
+                    case EVENT: {
+                        Task t = new Event(p.a, p.b, p.c);
+                        tasks.add(t);
+                        ui.showAdded(t, tasks.size());
+                        trySave();
+                        break;
+                    }
+                    case ON: {
+                        handleOn(p.a);
+                        break;
+                    }
+                    default:
+                        // unreachable
                 }
             } catch (DukeException e) {
                 ui.showError(e.getMessage());
@@ -125,7 +125,8 @@ public class Kenma {
     }
 
     /**
-     * Handles the {@code on yyyy-MM-dd} command: prints tasks that occur on the given date.
+     * Handles the {@code on yyyy-MM-dd} command: prints tasks that occur on the
+     * given date.
      *
      * @param dateStr date string in {@code yyyy-MM-dd} format
      */
@@ -159,7 +160,8 @@ public class Kenma {
     }
 
     /**
-     * Parses and validates a 1-based index argument against the current task list size.
+     * Parses and validates a 1-based index argument against the current task list
+     * size.
      *
      * @param raw  raw user input for the index
      * @param size current task list size
@@ -194,7 +196,8 @@ public class Kenma {
     /**
      * Program entry point. Accepts an optional file path argument.
      *
-     * @param args {@code [0]} may specify the save file path; otherwise {@code data/kenma.txt} is used
+     * @param args {@code [0]} may specify the save file path; otherwise
+     *             {@code data/kenma.txt} is used
      */
     public static void main(String[] args) {
         String path = (args.length > 0) ? args[0] : "data/kenma.txt";
