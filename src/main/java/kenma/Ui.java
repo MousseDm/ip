@@ -1,11 +1,20 @@
 package kenma;
+
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Handles user interaction by reading commands and printing messages to the console.
+ */
 public class Ui {
     private static final String LINE = "____________________________________________________________";
     private final Scanner sc = new Scanner(System.in);
 
+    /**
+     * Displays the welcome banner and logo.
+     *
+     * @param logo ASCII logo to print
+     */
     public void showWelcome(String logo) {
         System.out.println(logo);
         System.out.println(LINE);
@@ -14,18 +23,31 @@ public class Ui {
         System.out.println(LINE);
     }
 
+    /**
+     * Reads the next line of user input.
+     *
+     * @return trimmed input string, empty string if null, or {@code null} if EOF
+     */
     public String readCommand() {
-        if (!sc.hasNextLine()) return null;
+        if (!sc.hasNextLine()) {
+            return null;
+        }
         String s = sc.nextLine();
         return s == null ? "" : s.trim();
     }
 
+    /** Displays the goodbye message. */
     public void showBye() {
         System.out.println(LINE);
         System.out.println(" Bye. Hope to see you again soon!");
         System.out.println(LINE);
     }
 
+    /**
+     * Displays the current task list.
+     *
+     * @param tasks tasks to display
+     */
     public void showList(List<Task> tasks) {
         System.out.println(LINE);
         if (tasks.isEmpty()) {
@@ -39,6 +61,12 @@ public class Ui {
         System.out.println(LINE);
     }
 
+    /**
+     * Displays a message after adding a task.
+     *
+     * @param t     the task added
+     * @param count total number of tasks after addition
+     */
     public void showAdded(Task t, int count) {
         System.out.println(LINE);
         System.out.println(" Got it. I've added this task:");
@@ -47,6 +75,11 @@ public class Ui {
         System.out.println(LINE);
     }
 
+    /**
+     * Displays a message after marking a task as done.
+     *
+     * @param t task that was marked
+     */
     public void showMarked(Task t) {
         System.out.println(LINE);
         System.out.println(" Nice! I've marked this task as done:");
@@ -54,6 +87,11 @@ public class Ui {
         System.out.println(LINE);
     }
 
+    /**
+     * Displays a message after marking a task as not done.
+     *
+     * @param t task that was unmarked
+     */
     public void showUnmarked(Task t) {
         System.out.println(LINE);
         System.out.println(" OK, I've marked this task as not done yet:");
@@ -61,6 +99,12 @@ public class Ui {
         System.out.println(LINE);
     }
 
+    /**
+     * Displays a message after deleting a task.
+     *
+     * @param t     task that was deleted
+     * @param count total number of tasks after deletion
+     */
     public void showDeleted(Task t, int count) {
         System.out.println(LINE);
         System.out.println(" Noted. I've removed this task:");
@@ -69,6 +113,11 @@ public class Ui {
         System.out.println(LINE);
     }
 
+    /**
+     * Displays an error message.
+     *
+     * @param msg error message text
+     */
     public void showError(String msg) {
         System.out.println(LINE);
         System.out.println(" " + msg);
