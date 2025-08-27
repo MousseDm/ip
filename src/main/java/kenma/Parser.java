@@ -1,3 +1,4 @@
+package kenma;
 public class Parser {
     public static Parsed parse(String input) throws DukeException {
         String s = input.trim();
