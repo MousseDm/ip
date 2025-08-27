@@ -118,6 +118,7 @@ public class Kenma {
     }
 
     public static void main(String[] args) {
-        new Kenma("../data/kenma.txt").run();
+        String path = (args.length > 0) ? args[0] : "data/kenma.txt";
+        new Kenma(path).run();
     }
 }

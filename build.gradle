@@ -1,16 +1,23 @@
 plugins {
     id 'java'
     id 'application'
-    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'checkstyle'
+    id 'com.github.johnrengelman.shadow' version '7.1.2' // 教程版本
 }
 
 repositories {
     mavenCentral()
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
 dependencies {
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.0'
-    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.10.0'
+    // testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    // testRuntimeOnly   'org.junit.platform:junit-platform-launcher:1.10.2'
 }
 
 test {
@@ -18,7 +25,6 @@ test {
 
     testLogging {
         events "passed", "skipped", "failed"
-
         showExceptions true
         exceptionFormat "full"
         showCauses true
@@ -28,14 +34,18 @@ test {
 }
 
 application {
-    mainClass.set("seedu.duke.Duke")
+    mainClass = 'kenma.Kenma'   
+}
+
+run {
+    standardInput = System.in
+    enableAssertions = true
 }
 
 shadowJar {
     archiveBaseName = "duke"
     archiveClassifier = null
-}
-
-run{
-    standardInput = System.in
+    manifest {
+        attributes 'Main-Class': application.mainClass
+    }
 }

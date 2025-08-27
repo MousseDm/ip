@@ -12,3 +12,4 @@ E | 0 | project meeting | 2pm | 4pm
 T | 0 | read book
 D | 0 | submit assignment | Monday
 E | 0 | project meeting | 2pm | 4pm
+T | 0 | odoro
