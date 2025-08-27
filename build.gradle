@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'application'
     id 'checkstyle'
-    id 'com.github.johnrengelman.shadow' version '7.1.2' // 教程版本
+    id 'com.github.johnrengelman.shadow' version '7.1.2' 
 }
 
 repositories {
@@ -32,9 +32,12 @@ test {
     }
 }
 
-
 application {
     mainClass = 'kenma.Kenma'   
+}
+
+tasks.named('shadowJar') {
+    archiveFileName = 'Duke.jar'     
 }
 
 run {
