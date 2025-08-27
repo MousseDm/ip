@@ -7,20 +7,20 @@ public class Parser {
             throw new DukeException("Empty command.");
         String lower = s.toLowerCase();
         if (lower.equals("bye"))
-            return new Parsed(Cmd.BYE);
+            return new Parsed(Command.BYE);
         if (lower.equals("list"))
-            return new Parsed(Cmd.LIST);
+            return new Parsed(Command.LIST);
         if (lower.startsWith("mark "))
-            return new Parsed(Cmd.MARK, s.substring(5).trim());
+            return new Parsed(Command.MARK, s.substring(5).trim());
         if (lower.startsWith("unmark "))
-            return new Parsed(Cmd.UNMARK, s.substring(7).trim());
+            return new Parsed(Command.UNMARK, s.substring(7).trim());
         if (lower.startsWith("delete "))
-            return new Parsed(Cmd.DELETE, s.substring(7).trim());
+            return new Parsed(Command.DELETE, s.substring(7).trim());
         if (lower.startsWith("todo")) {
             String desc = s.length() > 4 ? s.substring(4).trim() : "";
             if (desc.isEmpty())
                 throw new DukeException("The description of a todo cannot be empty.");
-            return new Parsed(Cmd.TODO, desc);
+            return new Parsed(Command.TODO, desc);
         }
         if (lower.startsWith("deadline")) {
             String body = s.substring(8).trim();
@@ -31,7 +31,7 @@ public class Parser {
             String by = body.substring(byPos + 3).trim();
             if (desc.isEmpty() || by.isEmpty())
                 throw new DukeException("Both description and '/by <when>' are required.");
-            return new Parsed(Cmd.DEADLINE, desc, by);
+            return new Parsed(Command.DEADLINE, desc, by);
         }
         if (lower.startsWith("event")) {
             String body = s.length() > 5 ? s.substring(5).trim() : "";
@@ -45,36 +45,43 @@ public class Parser {
             String to = body.substring(toPos + 3).trim();
             if (desc.isEmpty() || from.isEmpty() || to.isEmpty())
                 throw new DukeException("Event requires description, from and to.");
-            return new Parsed(Cmd.EVENT, desc, from, to);
+            return new Parsed(Command.EVENT, desc, from, to);
         }
         if (lower.startsWith("on ")) {
             String dateStr = s.substring(3).trim();
-            return new Parsed(Cmd.ON, dateStr);
+            return new Parsed(Command.ON, dateStr);
+        }
+        if (lower.startsWith("find")) {
+            String kw = s.length() > 4 ? s.substring(4).trim() : "";
+            if (kw.isEmpty()) {
+                throw new DukeException("Please provide a keyword to find.");
+            }
+            return new Parsed(Command.FIND, kw);
         }
         throw new DukeException("I'm sorry, but I don't know what that means :-(");
     }
 
-    public enum Cmd {
-        BYE, LIST, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, ON
+    public enum Command {
+        BYE, LIST, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, ON, FIND
     }
 
     public static class Parsed {
-        public final Cmd cmd;
+        public final Command cmd;
         public final String a, b, c;
 
-        public Parsed(Cmd cmd) {
+        public Parsed(Command cmd) {
             this(cmd, null, null, null);
         }
 
-        public Parsed(Cmd cmd, String a) {
+        public Parsed(Command cmd, String a) {
             this(cmd, a, null, null);
         }
 
-        public Parsed(Cmd cmd, String a, String b) {
+        public Parsed(Command cmd, String a, String b) {
             this(cmd, a, b, null);
         }
 
-        public Parsed(Cmd cmd, String a, String b, String c) {
+        public Parsed(Command cmd, String a, String b, String c) {
             this.cmd = cmd;
             this.a = a;
             this.b = b;

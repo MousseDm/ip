@@ -124,4 +124,23 @@ public class Ui {
         System.out.println(" " + msg);
         System.out.println(LINE);
     }
+
+    /**
+     * Displays tasks that match a keyword search.
+     *
+     * @param matches matching tasks
+     * @param keyword original keyword
+     */
+    public void showFound(List<Task> matches, String keyword) {
+        System.out.println(LINE);
+        if (matches.isEmpty()) {
+            System.out.println(" No matching tasks for: \"" + keyword + "\"");
+        } else {
+            System.out.println(" Here are the matching tasks in your list:");
+            for (int i = 0; i < matches.size(); i++) {
+                System.out.printf(" %d.%s%n", i + 1, matches.get(i));
+            }
+        }
+        System.out.println(LINE);
+    }
 }
