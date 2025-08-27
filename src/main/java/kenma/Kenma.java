@@ -3,6 +3,7 @@ package kenma;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 
 /**
  * Entry point and top-level coordinator of the Kenma/Duke application.
@@ -113,6 +114,11 @@ public class Kenma {
                     }
                     case ON: {
                         handleOn(p.a);
+                        break;
+                    }
+                    case FIND: {
+                        ArrayList<Task> matches = tasks.find(p.a);
+                        ui.showFound(matches, p.a);
                         break;
                     }
                     default:

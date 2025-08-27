@@ -70,4 +70,22 @@ public class TaskList {
     public Task remove(int idx1Based) {
         return tasks.remove(idx1Based - 1);
     }
+
+    /**
+     * Returns tasks whose description contains the given keyword
+     * (case-insensitive).
+     *
+     * @param keyword keyword to search
+     * @return matching tasks in encounter order
+     */
+    public ArrayList<Task> find(String keyword) {
+        String needle = keyword.toLowerCase();
+        ArrayList<Task> out = new ArrayList<>();
+        for (Task t : tasks) {
+            if (t.description != null && t.description.toLowerCase().contains(needle)) {
+                out.add(t);
+            }
+        }
+        return out;
+    }
 }
