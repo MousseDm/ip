@@ -1,3 +1,4 @@
+package kenma;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -117,6 +118,6 @@ public class Kenma {
     }
 
     public static void main(String[] args) {
-        new Kenma("./data/kenma.txt").run();
+        new Kenma("../data/kenma.txt").run();
     }
 }
