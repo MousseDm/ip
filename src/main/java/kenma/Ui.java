@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * Handles user interaction by reading commands and printing messages to the console.
+ * Handles user interaction by reading commands and printing messages to the
+ * console.
  */
 public class Ui {
     private static final String LINE = "____________________________________________________________";

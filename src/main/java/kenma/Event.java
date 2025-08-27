@@ -7,13 +7,15 @@ import java.time.format.DateTimeParseException;
 import java.util.Locale;
 
 /**
- * Represents an event that spans a time window with a start ({@code from}) and an end ({@code to}).
+ * Represents an event that spans a time window with a start ({@code from}) and
+ * an end ({@code to}).
  *
- * <p>Each endpoint supports:
+ * <p>
+ * Each endpoint supports:
  * <ul>
- *   <li>{@code yyyy-MM-dd HHmm} (datetime)</li>
- *   <li>{@code yyyy-MM-dd} (date only)</li>
- *   <li>Arbitrary string (kept raw if parsing fails)</li>
+ * <li>{@code yyyy-MM-dd HHmm} (datetime)</li>
+ * <li>{@code yyyy-MM-dd} (date only)</li>
+ * <li>Arbitrary string (kept raw if parsing fails)</li>
  * </ul>
  * If parsing succeeds, pretty-printed values are used in {@link #toString()}.
  */
@@ -26,10 +28,9 @@ public class Event extends Task {
     private LocalDate toDate;
     private LocalDateTime toDateTime;
 
-    private static final DateTimeFormatter FMT_DATE =
-            DateTimeFormatter.ofPattern("MMM d yyyy", Locale.ENGLISH);
-    private static final DateTimeFormatter FMT_DATETIME =
-            DateTimeFormatter.ofPattern("MMM d yyyy HH:mm", Locale.ENGLISH);
+    private static final DateTimeFormatter FMT_DATE = DateTimeFormatter.ofPattern("MMM d yyyy", Locale.ENGLISH);
+    private static final DateTimeFormatter FMT_DATETIME = DateTimeFormatter.ofPattern("MMM d yyyy HH:mm",
+            Locale.ENGLISH);
 
     /**
      * Creates an event with a description and its start/end endpoints.
@@ -48,11 +49,15 @@ public class Event extends Task {
     /**
      * Returns whether the event touches the given calendar date.
      *
-     * <p>A match occurs if either the parsed {@code from} date or the parsed {@code to} date
-     * equals {@code target}. If a datetime was provided, its date component is used.
+     * <p>
+     * A match occurs if either the parsed {@code from} date or the parsed
+     * {@code to} date
+     * equals {@code target}. If a datetime was provided, its date component is
+     * used.
      *
      * @param target target calendar date
-     * @return {@code true} if the event occurs on {@code target}; otherwise {@code false}
+     * @return {@code true} if the event occurs on {@code target}; otherwise
+     *         {@code false}
      */
     public boolean occursOn(LocalDate target) {
         boolean matchFrom = false;
@@ -74,8 +79,10 @@ public class Event extends Task {
     }
 
     /**
-     * Parses both {@code from} and {@code to} strings into {@link LocalDateTime} or {@link LocalDate} values.
-     * If parsing fails for an endpoint, the corresponding parsed fields remain {@code null}.
+     * Parses both {@code from} and {@code to} strings into {@link LocalDateTime} or
+     * {@link LocalDate} values.
+     * If parsing fails for an endpoint, the corresponding parsed fields remain
+     * {@code null}.
      */
     private void parse() {
         this.fromDate = null;
@@ -113,7 +120,8 @@ public class Event extends Task {
     }
 
     /**
-     * Returns a human-friendly representation for an endpoint, preferring parsed values.
+     * Returns a human-friendly representation for an endpoint, preferring parsed
+     * values.
      *
      * @param raw original string
      * @param d   parsed date (may be {@code null})
@@ -131,7 +139,8 @@ public class Event extends Task {
     }
 
     /**
-     * Returns the string representation of this event with pretty-printed endpoints.
+     * Returns the string representation of this event with pretty-printed
+     * endpoints.
      *
      * @return string representation of this event
      */

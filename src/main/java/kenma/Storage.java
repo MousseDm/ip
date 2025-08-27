@@ -12,11 +12,12 @@ import java.util.List;
 /**
  * Handles persistence of tasks to and from a plain-text file.
  *
- * <p>File format (pipe-delimited):
+ * <p>
+ * File format (pipe-delimited):
  * <ul>
- *   <li>{@code T | doneFlag | description}</li>
- *   <li>{@code D | doneFlag | description | by}</li>
- *   <li>{@code E | doneFlag | description | from | to}</li>
+ * <li>{@code T | doneFlag | description}</li>
+ * <li>{@code D | doneFlag | description | by}</li>
+ * <li>{@code E | doneFlag | description | from | to}</li>
  * </ul>
  * where {@code doneFlag} is {@code "1"} if done, otherwise {@code "0"}.
  */
@@ -91,42 +92,42 @@ public class Storage {
         String desc = p[2];
         try {
             switch (type) {
-            case "T": {
-                Todo t = new Todo(desc);
-                if (isDone) {
-                    t.markAsDone();
-                }
-                return t;
-            }
-            case "D": {
-                if (p.length < 4) {
-                    return null;
-                }
-                Deadline d = new Deadline(desc, p[3]);
-                if (isDone) {
-                    d.markAsDone();
-                }
-                return d;
-            }
-            case "E": {
-                if (p.length == 4) {
-                    Event e = new Event(desc, p[3], "");
+                case "T": {
+                    Todo t = new Todo(desc);
                     if (isDone) {
-                        e.markAsDone();
+                        t.markAsDone();
                     }
-                    return e;
-                } else if (p.length >= 5) {
-                    Event e = new Event(desc, p[3], p[4]);
-                    if (isDone) {
-                        e.markAsDone();
-                    }
-                    return e;
-                } else {
-                    return null;
+                    return t;
                 }
-            }
-            default:
-                return null;
+                case "D": {
+                    if (p.length < 4) {
+                        return null;
+                    }
+                    Deadline d = new Deadline(desc, p[3]);
+                    if (isDone) {
+                        d.markAsDone();
+                    }
+                    return d;
+                }
+                case "E": {
+                    if (p.length == 4) {
+                        Event e = new Event(desc, p[3], "");
+                        if (isDone) {
+                            e.markAsDone();
+                        }
+                        return e;
+                    } else if (p.length >= 5) {
+                        Event e = new Event(desc, p[3], p[4]);
+                        if (isDone) {
+                            e.markAsDone();
+                        }
+                        return e;
+                    } else {
+                        return null;
+                    }
+                }
+                default:
+                    return null;
             }
         } catch (Exception ex) {
             return null;
