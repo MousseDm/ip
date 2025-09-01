@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'application'
     id 'checkstyle'
-    id 'com.github.johnrengelman.shadow' version '7.1.2' 
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 repositories {
@@ -33,11 +33,11 @@ test {
 }
 
 application {
-    mainClass = 'kenma.Kenma'   
+    mainClass = 'kenma.Kenma'
 }
 
 tasks.named('shadowJar') {
-    archiveFileName = 'Duke.jar'     
+    archiveFileName = 'Duke.jar'
 }
 
 run {
@@ -50,5 +50,20 @@ shadowJar {
     archiveClassifier = null
     manifest {
         attributes 'Main-Class': application.mainClass
+    }
+}
+
+/* === Checkstyle config === */
+checkstyle {
+    toolVersion = '10.12.4' // Java 17-compatible; use school-recommended if different
+    configFile = file('config/checkstyle/checkstyle.xml')
+    // pass suppression file path as a property
+    configProperties = ["suppressionFile": file('config/checkstyle/suppressions.xml')]
+}
+
+tasks.withType(Checkstyle).configureEach {
+    reports {
+        html.required = true
+        xml.required  = false
     }
 }
