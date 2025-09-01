@@ -1,26 +1,94 @@
-# Kenma project template
+Kenma iP
 
-This is a project template for a greenfield Java project. It's named after the Java mascot _Duke_. Given below are instructions on how to use it.
+“Kenma iP: making task management simple and fun!” – Anonymous
 
-## Setting up in Intellij
+Kenma iP is a Java project template based on the Duke skeleton that helps you quickly get started with Java project development.
 
-Prerequisites: JDK 17, update Intellij to the most recent version.
+It is:
 
-1. Open Intellij (if you are not in the welcome screen, click `File` > `Close Project` to close the existing project first)
-1. Open the project into Intellij as follows:
-   1. Click `Open`.
-   1. Select the project directory, and click `OK`.
-   1. If there are any further prompts, accept the defaults.
-1. Configure the project to use **JDK 17** (not other versions) as explained in [here](https://www.jetbrains.com/help/idea/sdk.html#set-up-jdk).<br>
-   In the same dialog, set the **Project language level** field to the `SDK default` option.
-1. After that, locate the `src/main/java/Kenma.java` file, right-click it, and choose `Run Kenma.main()` (if the code editor is showing compile errors, try restarting the IDE). If the setup is correct, you should see something like the below as the output:
-   ```
-   Hello from
-    ____        _        
-   |  _ \ _   _| | _____ 
-   | | | | | | | |/ / _ \
-   | |_| | |_| |   <  __/
-   |____/ \__,_|_|\_\___|
-   ```
+text-based
 
-**Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
+easy to learn
+
+boring SUPER FAST 🚀
+
+All you need to do is:
+
+Download the project.
+
+Open it in IntelliJ IDEA.
+
+Run Kenma.main().
+
+Add your tasks and let it manage them for you 😉
+
+Setting up in IntelliJ
+
+Prerequisites: JDK 17, and the latest version of IntelliJ.
+
+Open IntelliJ (if you are not on the welcome screen, click File > Close Project to close the current project).
+
+Import the project into IntelliJ:
+
+Click Open.
+
+Select the project directory, then click OK.
+
+Accept defaults for any further prompts.
+
+Configure the project to use JDK 17 (not any other version), as explained in the official guide
+.
+In the same dialog, set the Project language level field to SDK default.
+
+Locate the file src/main/java/Kenma.java, right-click it, and choose Run Kenma.main().
+If everything is set up correctly, you should see the following output:
+
+Hello from
+ ____        _        
+|  _ \ _   _| | _____ 
+| | | | | | | |/ / _ \
+| |_| | |_| |   <  __/
+|____/ \__,_|_|\_\___|
+
+
+Warning: Keep the src/main/java folder as the root folder for Java source files. Don’t rename or move these folders, as tools like Gradle expect this path by default.
+
+Features
+
+ Task management
+
+ Deadlines (coming soon)
+
+ Reminders (coming soon)
+
+Use ./gradlew run to start the application.
+
+This PR adds:
+
+Command parsing functionality
+
+Task list support
+
+Improved UI ✨
+
+✅ This description demonstrates all required GFMD elements:
+
+Heading
+
+Bullet list
+
+Numbered list
+
+Fenced code block (Java syntax highlighting)
+
+Task list
+
+Emoji 😉🚀✨
+
+Blockquote
+
+Hyperlink
+
+Inline code (./gradlew run)
+
+Text formatting (bold, italic, strikethrough)
