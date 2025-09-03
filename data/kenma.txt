@@ -1,6 +1,4 @@
 T | 0 | read book
-T | 1 | join sports club
-E | 1 | cca | 7pm | 9pm
 D | 1 | return book | 2019-12-02
 D | 0 | submit report | 2019-12-02 1800
 E | 0 | project meeting | 2019-12-02 | 2019-12-03
