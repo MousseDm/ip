@@ -11,6 +11,15 @@ public class Ui {
     private static final String LINE = "____________________________________________________________";
     private final Scanner sc = new Scanner(System.in);
 
+    /** Prints a boxed block with each line prefixed by a space. */
+    public void showMessage(String... lines) {
+        System.out.println(LINE);
+        for (String s : lines) {
+            System.out.println(" " + s);
+        }
+        System.out.println(LINE);
+    }
+
     /**
      * Displays the welcome banner and logo.
      *
@@ -120,9 +129,7 @@ public class Ui {
      * @param msg error message text
      */
     public void showError(String msg) {
-        System.out.println(LINE);
-        System.out.println(" " + msg);
-        System.out.println(LINE);
+        showMessage(msg);
     }
 
     /**
