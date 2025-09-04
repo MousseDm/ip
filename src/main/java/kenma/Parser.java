@@ -69,23 +69,12 @@ public class Parser {
         public final Command cmd;
         public final String a, b, c;
 
-        public Parsed(Command cmd) {
-            this(cmd, null, null, null);
-        }
-
-        public Parsed(Command cmd, String a) {
-            this(cmd, a, null, null);
-        }
-
-        public Parsed(Command cmd, String a, String b) {
-            this(cmd, a, b, null);
-        }
-
-        public Parsed(Command cmd, String a, String b, String c) {
+        public Parsed(Command cmd, String... args) {
             this.cmd = cmd;
-            this.a = a;
-            this.b = b;
-            this.c = c;
+            this.a = args.length > 0 ? args[0] : null;
+            this.b = args.length > 1 ? args[1] : null;
+            this.c = args.length > 2 ? args[2] : null;
         }
     }
+
 }
