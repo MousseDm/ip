@@ -49,13 +49,12 @@ public class TaskList {
     public List<Task> find(String keyword) {
         assert keyword != null && !keyword.isBlank();
         String needle = keyword.toLowerCase();
-        ArrayList<Task> out = new ArrayList<>();
-        for (Task t : tasks) {
-            String d = t.getDescription();
-            if (d != null && d.toLowerCase().contains(needle)) {
-                out.add(t);
-            }
-        }
-        return out;
+        return tasks.stream()
+                .filter(t -> {
+                    String d = t.getDescription();
+                    return d != null && d.toLowerCase().contains(needle);
+                })
+                .toList();
     }
+
 }
