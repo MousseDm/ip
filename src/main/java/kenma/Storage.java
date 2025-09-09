@@ -9,37 +9,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Handles persistence of tasks to and from a plain-text file.
- *
- * <p>
- * File format (pipe-delimited):
- * <ul>
- * <li>{@code T | doneFlag | description}</li>
- * <li>{@code D | doneFlag | description | by}</li>
- * <li>{@code E | doneFlag | description | from | to}</li>
- * </ul>
- * where {@code doneFlag} is {@code "1"} if done, otherwise {@code "0"}.
- */
+/** Handles persistence of tasks to and from a plain-text file. */
 public class Storage {
     private final Path file;
 
-    /**
-     * Creates a storage backed by the given file path.
-     *
-     * @param filePath path to the save file
-     */
     public Storage(String filePath) {
+        assert filePath != null && !filePath.isBlank();
         this.file = Paths.get(filePath);
     }
 
-    /**
-     * Loads tasks from disk.
-     *
-     * @return list of tasks (empty if file does not exist or on decoding errors)
-     * @throws IOException if an I/O error occurs while reading the file
-     */
     public List<Task> load() throws IOException {
+        assert file != null;
         if (!Files.exists(file)) {
             return new ArrayList<>();
         }
@@ -51,35 +31,24 @@ public class Storage {
                 tasks.add(t);
             }
         }
+        assert tasks != null;
         return tasks;
     }
 
-    /**
-     * Saves the given tasks to disk, creating parent directories if necessary.
-     *
-     * @param tasks tasks to persist
-     * @throws IOException if an I/O error occurs while writing the file
-     */
     public void save(List<Task> tasks) throws IOException {
+        assert tasks != null;
         Files.createDirectories(file.getParent());
         try (BufferedWriter bw = Files.newBufferedWriter(file)) {
             for (Task t : tasks) {
                 String s = encode(t);
-                if (s != null) {
-                    bw.write(s);
-                    bw.newLine();
-                }
+                assert s != null;
+                bw.write(s);
+                bw.newLine();
             }
         }
+        assert Files.exists(file);
     }
 
-    /**
-     * Decodes one line from the save file into a {@link Task}.
-     * Lines that cannot be decoded safely return {@code null}.
-     *
-     * @param line raw line from the file
-     * @return decoded task or {@code null} if invalid
-     */
     private Task decode(String line) {
         String[] p = Arrays.stream(line.split("\\|"))
                 .map(String::trim)
@@ -94,33 +63,28 @@ public class Storage {
             switch (type) {
                 case "T": {
                     Todo t = new Todo(desc);
-                    if (isDone) {
+                    if (isDone)
                         t.markAsDone();
-                    }
                     return t;
                 }
                 case "D": {
-                    if (p.length < 4) {
+                    if (p.length < 4)
                         return null;
-                    }
                     Deadline d = new Deadline(desc, p[3]);
-                    if (isDone) {
+                    if (isDone)
                         d.markAsDone();
-                    }
                     return d;
                 }
                 case "E": {
                     if (p.length == 4) {
                         Event e = new Event(desc, p[3], "");
-                        if (isDone) {
+                        if (isDone)
                             e.markAsDone();
-                        }
                         return e;
                     } else if (p.length >= 5) {
                         Event e = new Event(desc, p[3], p[4]);
-                        if (isDone) {
+                        if (isDone)
                             e.markAsDone();
-                        }
                         return e;
                     } else {
                         return null;
@@ -134,13 +98,6 @@ public class Storage {
         }
     }
 
-    /**
-     * Encodes a {@link Task} into one save-file line.
-     * Returns {@code null} if the task type is not recognized.
-     *
-     * @param t task to encode
-     * @return encoded line or {@code null} if unsupported type
-     */
     private String encode(Task t) {
         String flag = t.isDone ? "1" : "0";
         if (t instanceof Todo) {
