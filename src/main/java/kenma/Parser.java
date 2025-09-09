@@ -67,6 +67,10 @@ public class Parser {
             assert !dateStr.isEmpty();
             return new Parsed(Command.ON, dateStr);
         }
+        if (lower.startsWith("sort")) {
+            String mode = s.length() > 4 ? s.substring(4).trim().toLowerCase() : "";
+            return new Parsed(Command.SORT, mode);
+        }
         if (lower.startsWith("find")) {
             String kw = s.length() > 4 ? s.substring(4).trim() : "";
             assert kw != null;
@@ -79,7 +83,7 @@ public class Parser {
     }
 
     public enum Command {
-        BYE, LIST, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, ON, FIND
+        BYE, LIST, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, ON, FIND, SORT
     }
 
     public static class Parsed {

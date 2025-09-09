@@ -94,6 +94,14 @@ public class Event extends Task {
         return raw;
     }
 
+    public java.time.LocalDateTime getFromDateTime() {
+        return fromDateTime;
+    }
+
+    public java.time.LocalDate getFromDate() {
+        return fromDate;
+    }
+
     @Override
     public String toString() {
         return "[" + getType().getSymbol() + "]"

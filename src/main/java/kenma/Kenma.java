@@ -1,6 +1,7 @@
 package kenma;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -146,6 +147,49 @@ public class Kenma {
         return sb.toString().trim();
     }
 
+    private List<Task> sortTasks(String mode) {
+        return tasks.all().stream()
+                .sorted((a, b) -> {
+                    switch (mode) {
+                        case "by name":
+                            return a.getDescription().compareToIgnoreCase(b.getDescription());
+                        case "by status":
+                            return Boolean.compare(a.isDone(), b.isDone());
+                        case "by time":
+                            LocalDateTime ta = extractDateTime(a);
+                            LocalDateTime tb = extractDateTime(b);
+                            if (ta == null && tb == null)
+                                return 0;
+                            if (ta == null)
+                                return 1;
+                            if (tb == null)
+                                return -1;
+                            return ta.compareTo(tb);
+                        default:
+                            return 0;
+                    }
+                })
+                .toList();
+    }
+
+    private LocalDateTime extractDateTime(Task t) {
+        if (t instanceof Deadline) {
+            Deadline d = (Deadline) t;
+            if (d.getDueDateTime() != null)
+                return d.getDueDateTime();
+            if (d.getDueDate() != null)
+                return d.getDueDate().atStartOfDay();
+        }
+        if (t instanceof Event) {
+            Event e = (Event) t;
+            if (e.getFromDateTime() != null)
+                return e.getFromDateTime();
+            if (e.getFromDate() != null)
+                return e.getFromDate().atStartOfDay();
+        }
+        return null;
+    }
+
     private int requireValidIndex(String raw, int size) throws DukeException {
         assert raw != null && !raw.isBlank();
         int idx;
@@ -264,6 +308,12 @@ public class Kenma {
                     }
                     case FIND: {
                         ui.showFound(tasks.find(p.a), p.a);
+                        break;
+                    }
+                    case SORT: {
+                        String mode = (p.a == null) ? "" : p.a;
+                        List<Task> sorted = sortTasks(mode);
+                        ui.showList(sorted);
                         break;
                     }
                     default:

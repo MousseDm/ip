@@ -64,6 +64,14 @@ public class Deadline extends Task {
         return false;
     }
 
+    public java.time.LocalDateTime getDueDateTime() {
+        return dateTime;
+    }
+
+    public java.time.LocalDate getDueDate() {
+        return date;
+    }
+
     @Override
     public String toString() {
         return "[" + getType().getSymbol() + "]" + super.toString() + " (by: " + pretty() + ")";
