@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [ master, "branch-*" ]
+  pull_request:
+    branches: [ master ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v2
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Checkstyle and Tests
+        run: ./gradlew clean checkstyleMain checkstyleTest test --no-daemon
+
+      - name: Build shadow JAR (linux)
+        run: ./gradlew shadowJar --no-daemon -Pos=linux
+
+      - name: Show JAR size
+        run: ls -lh build/libs/*.jar || true
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: duke-linux-jar
+          path: build/libs/*.jar
+          if-no-files-found: error
