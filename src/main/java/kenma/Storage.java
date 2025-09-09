@@ -99,17 +99,18 @@ public class Storage {
     }
 
     private String encode(Task t) {
-        String flag = t.isDone ? "1" : "0";
+        String flag = t.isDone() ? "1" : "0";
         if (t instanceof Todo) {
-            return "T | " + flag + " | " + t.description;
+            return "T | " + flag + " | " + t.getDescription();
         } else if (t instanceof Deadline) {
-            return "D | " + flag + " | " + t.description + " | " + ((Deadline) t).by;
+            Deadline d = (Deadline) t;
+            return "D | " + flag + " | " + d.getDescription() + " | " + d.getBy();
         } else if (t instanceof Event) {
             Event e = (Event) t;
-            if (e.to == null || e.to.isEmpty()) {
-                return "E | " + flag + " | " + e.description + " | " + e.from;
+            if (e.getTo() == null || e.getTo().isEmpty()) {
+                return "E | " + flag + " | " + e.getDescription() + " | " + e.getFrom();
             }
-            return "E | " + flag + " | " + e.description + " | " + e.from + " | " + e.to;
+            return "E | " + flag + " | " + e.getDescription() + " | " + e.getFrom() + " | " + e.getTo();
         } else {
             return null;
         }

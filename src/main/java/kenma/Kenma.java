@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Entry point and top-level coordinator of the Kenma/Duke application.
@@ -51,98 +52,55 @@ public class Kenma {
         }
         try {
             Parser.Parsed p = Parser.parse(input);
-            StringBuilder out = new StringBuilder();
             switch (p.cmd) {
                 case BYE:
-                    out.append("Bye. Hope to see you again soon!");
-                    break;
+                    return "Bye. Hope to see you again soon!";
 
-                case LIST: {
-                    ArrayList<Task> all = tasks.all();
-                    out.append("Here are the tasks in your list:\n");
-                    for (int i = 0; i < all.size(); i++) {
-                        out.append(String.format("%d.%s%n", i + 1, all.get(i)));
-                    }
-                    break;
-                }
+                case LIST:
+                    return formatList("Here are the tasks in your list:", tasks.all());
 
                 case MARK: {
                     int idx = requireValidIndex(p.a, tasks.size());
                     tasks.get(idx).markAsDone();
-                    out.append("Nice! I've marked this task as done:\n")
-                            .append(tasks.get(idx));
                     trySave();
-                    break;
+                    return "Nice! I've marked this task as done:\n" + tasks.get(idx);
                 }
 
                 case UNMARK: {
                     int idx = requireValidIndex(p.a, tasks.size());
                     tasks.get(idx).markAsNotDone();
-                    out.append("OK, I've marked this task as not done yet:\n")
-                            .append(tasks.get(idx));
                     trySave();
-                    break;
+                    return "OK, I've marked this task as not done yet:\n" + tasks.get(idx);
                 }
 
                 case DELETE: {
                     int idx = requireValidIndex(p.a, tasks.size());
                     Task removed = tasks.remove(idx);
-                    out.append("Noted. I've removed this task:\n")
-                            .append(removed)
-                            .append(String.format("%nNow you have %d tasks in the list.", tasks.size()));
                     trySave();
-                    break;
+                    return "Noted. I've removed this task:\n" + removed
+                            + String.format("%nNow you have %d tasks in the list.", tasks.size());
                 }
 
-                case TODO: {
-                    Task t = new Todo(p.a);
-                    tasks.add(t);
-                    out.append("Got it. I've added this task:\n")
-                            .append(t)
-                            .append(String.format("%nNow you have %d tasks in the list.", tasks.size()));
-                    trySave();
-                    break;
-                }
+                case TODO:
+                    return addTaskAndRespond(new Todo(p.a));
 
-                case DEADLINE: {
-                    Task t = new Deadline(p.a, p.b);
-                    tasks.add(t);
-                    out.append("Got it. I've added this task:\n")
-                            .append(t)
-                            .append(String.format("%nNow you have %d tasks in the list.", tasks.size()));
-                    trySave();
-                    break;
-                }
+                case DEADLINE:
+                    return addTaskAndRespond(new Deadline(p.a, p.b));
 
-                case EVENT: {
-                    Task t = new Event(p.a, p.b, p.c);
-                    tasks.add(t);
-                    out.append("Got it. I've added this task:\n")
-                            .append(t)
-                            .append(String.format("%nNow you have %d tasks in the list.", tasks.size()));
-                    trySave();
-                    break;
-                }
+                case EVENT:
+                    return addTaskAndRespond(new Event(p.a, p.b, p.c));
 
-                case ON: {
-                    out.append(tasksOnDateAsText(p.a));
-                    break;
-                }
+                case ON:
+                    return tasksOnDateAsText(p.a);
 
                 case FIND: {
-                    ArrayList<Task> matches = tasks.find(p.a);
-                    out.append(String.format("Here are the matching tasks containing \"%s\":%n", p.a));
-                    for (int i = 0; i < matches.size(); i++) {
-                        out.append(String.format("%d.%s%n", i + 1, matches.get(i)));
-                    }
-                    break;
+                    List<Task> matches = tasks.find(p.a);
+                    return formatList(String.format("Here are the matching tasks containing \"%s\":", p.a), matches);
                 }
 
                 default:
-                    // unreachable
+                    return "";
             }
-            return out.toString().trim();
-
         } catch (DukeException e) {
             return e.getMessage();
         }
@@ -205,15 +163,31 @@ public class Kenma {
         try {
             storage.save(tasks.all());
         } catch (Exception ignore) {
-            // Ignore I/O errors to keep the app responsive
         }
     }
 
-    /* ===================== CLI ENTRY (OPTIONAL) ====================== */
+    private String addTaskAndRespond(Task t) {
+        tasks.add(t);
+        trySave();
+        return "Got it. I've added this task:\n" + t
+                + String.format("%nNow you have %d tasks in the list.", tasks.size());
+    }
 
-    /**
-     * Classic CLI run loop (kept for compatibility). Not used by JavaFX.
-     */
+    private String formatList(String header, List<Task> list) {
+        StringBuilder out = new StringBuilder(header).append('\n');
+        for (int i = 0; i < list.size(); i++) {
+            out.append(String.format("%d.%s%n", i + 1, list.get(i)));
+        }
+        return out.toString().trim();
+    }
+
+    /** CLI main – optional. JavaFX uses Launcher to Main. */
+    public static void main(String[] args) {
+        String path = (args.length > 0) ? args[0] : "data/kenma.txt";
+        new Kenma(path).run();
+    }
+
+    /** Classic CLI run loop (kept for compatibility). Not used by JavaFX. */
     private void run() {
         String logo = " _  __ ______ _   _ __  __       \n"
                 + "| |/ /|  ____| \\ | |  \\/  |   /\\ \n"
@@ -225,7 +199,7 @@ public class Kenma {
 
         while (true) {
             String input = ui.readCommand();
-            if (input == null) { // EOF
+            if (input == null) {
                 ui.showBye();
                 break;
             }
@@ -288,24 +262,14 @@ public class Kenma {
                         break;
                     }
                     case FIND: {
-                        ArrayList<Task> matches = tasks.find(p.a);
-                        ui.showFound(matches, p.a);
+                        ui.showFound(tasks.find(p.a), p.a);
                         break;
                     }
                     default:
-                        // unreachable
                 }
             } catch (DukeException e) {
                 ui.showError(e.getMessage());
             }
         }
-    }
-
-    /**
-     * CLI main – optional. JavaFX uses Launcher to Main.
-     */
-    public static void main(String[] args) {
-        String path = (args.length > 0) ? args[0] : "data/kenma.txt";
-        new Kenma(path).run();
     }
 }
