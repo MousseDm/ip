@@ -31,10 +31,12 @@ public class Kenma {
         try {
             loaded = new TaskList(storage.load());
         } catch (Exception e) {
-            // For GUI mode we avoid printing; UI can show warnings in CLI mode
             loaded = new TaskList();
         }
         this.tasks = loaded;
+        assert ui != null;
+        assert storage != null;
+        assert tasks != null;
     }
 
     /* ===================== GUI ENTRY (SINGLE-TURN) ====================== */
@@ -185,6 +187,7 @@ public class Kenma {
     }
 
     private int requireValidIndex(String raw, int size) throws DukeException {
+        assert raw != null && !raw.isBlank();
         int idx;
         try {
             idx = Integer.parseInt(raw.trim());
@@ -194,6 +197,7 @@ public class Kenma {
         if (idx < 1 || idx > size) {
             throw new DukeException("Index out of range. Valid range: 1.." + size + ".");
         }
+        assert idx >= 1 && idx <= size;
         return idx;
     }
 
