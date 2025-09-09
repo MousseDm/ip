@@ -8,7 +8,7 @@ import java.util.Locale;
 
 /** Represents a task that must be completed by a specific time. */
 public class Deadline extends Task {
-    protected String by;
+    private final String by;
     private LocalDate date;
     private LocalDateTime dateTime;
 
@@ -21,6 +21,10 @@ public class Deadline extends Task {
         assert by != null && !by.isBlank();
         this.by = by;
         parse(by);
+    }
+
+    public String getBy() {
+        return by;
     }
 
     private void parse(String s) {
@@ -62,8 +66,6 @@ public class Deadline extends Task {
 
     @Override
     public String toString() {
-        return "[" + this.type.getSymbol() + "]"
-                + super.toString()
-                + " (by: " + pretty() + ")";
+        return "[" + getType().getSymbol() + "]" + super.toString() + " (by: " + pretty() + ")";
     }
 }

@@ -8,8 +8,8 @@ import java.util.Locale;
 
 /** Represents an event that spans a time window with a start and an end. */
 public class Event extends Task {
-    protected String from;
-    protected String to;
+    private final String from;
+    private final String to;
 
     private LocalDate fromDate;
     private LocalDateTime fromDateTime;
@@ -27,6 +27,14 @@ public class Event extends Task {
         this.from = from;
         this.to = to;
         parse();
+    }
+
+    public String getFrom() {
+        return from;
+    }
+
+    public String getTo() {
+        return to;
     }
 
     public boolean occursOn(LocalDate target) {
@@ -88,7 +96,7 @@ public class Event extends Task {
 
     @Override
     public String toString() {
-        return "[" + this.type.getSymbol() + "]"
+        return "[" + getType().getSymbol() + "]"
                 + super.toString()
                 + " (from: " + prettyDate(from, fromDate, fromDateTime)
                 + " to: " + prettyDate(to, toDate, toDateTime) + ")";
