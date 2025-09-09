@@ -15,56 +15,55 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    String javaFxVersion = '17.0.7'
+def javafxVersion = '17.0.7'
 
-    implementation group: 'org.openjfx', name: 'javafx-base',      version: javaFxVersion, classifier: 'win'
-    implementation group: 'org.openjfx', name: 'javafx-base',      version: javaFxVersion, classifier: 'mac'
-    implementation group: 'org.openjfx', name: 'javafx-base',      version: javaFxVersion, classifier: 'linux'
-    implementation group: 'org.openjfx', name: 'javafx-controls',  version: javaFxVersion, classifier: 'win'
-    implementation group: 'org.openjfx', name: 'javafx-controls',  version: javaFxVersion, classifier: 'mac'
-    implementation group: 'org.openjfx', name: 'javafx-controls',  version: javaFxVersion, classifier: 'linux'
-    implementation group: 'org.openjfx', name: 'javafx-fxml',      version: javaFxVersion, classifier: 'win'
-    implementation group: 'org.openjfx', name: 'javafx-fxml',      version: javaFxVersion, classifier: 'mac'
-    implementation group: 'org.openjfx', name: 'javafx-fxml',      version: javaFxVersion, classifier: 'linux'
-    implementation group: 'org.openjfx', name: 'javafx-graphics',  version: javaFxVersion, classifier: 'win'
-    implementation group: 'org.openjfx', name: 'javafx-graphics',  version: javaFxVersion, classifier: 'mac'
-    implementation group: 'org.openjfx', name: 'javafx-graphics',  version: javaFxVersion, classifier: 'linux'
+// Determine target OS for JavaFX natives.
+// Use:  ./gradlew clean shadowJar -Pos=win   (or mac / linux)
+// Default: detect from current JVM if -Pos not given.
+def osProp = findProperty("os")?.toString()
+def currentOs = org.gradle.internal.os.OperatingSystem.current()
+def detectedOs = currentOs.isWindows() ? "win" : (currentOs.isMacOsX() ? "mac" : "linux")
+def targetOs = (osProp in ["win","mac","linux"]) ? osProp : detectedOs
+
+dependencies {
+    implementation "org.openjfx:javafx-base:${javafxVersion}:${targetOs}"
+    implementation "org.openjfx:javafx-controls:${javafxVersion}:${targetOs}"
+    implementation "org.openjfx:javafx-fxml:${javafxVersion}:${targetOs}"
+    implementation "org.openjfx:javafx-graphics:${javafxVersion}:${targetOs}"
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testRuntimeOnly   'org.junit.platform:junit-platform-launcher:1.10.2'
 }
 
 application {
+    // Your launcher class:
     mainClass = "kenma.Launcher"
+    // (Note: enableAssertions here affects `gradlew run`, not the JAR.)
 }
 
 sourceSets {
     main {
-        java {
-            srcDirs = ['src/main/java']
-        }
-        resources {
-            srcDirs = ['src/main/resources']
-        }
+        java.srcDirs = ['src/main/java']
+        resources.srcDirs = ['src/main/resources']
     }
 }
 
-tasks.named('shadowJar') {
-    archiveFileName = 'Duke.jar'
+/* === Tests === */
+test {
+    useJUnitPlatform()
 }
 
-run {
-    standardInput = System.in
-    enableAssertions = true
-}
-
-shadowJar {
-    archiveBaseName = "duke"
-    archiveClassifier = null
+/* === Shadow JAR config === */
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    archiveBaseName.set('duke')
+    archiveVersion.set('')          // omit version in file name
+    archiveClassifier.set(targetOs) // e.g., duke-w in / duke-mac / duke-linux
     manifest {
         attributes 'Main-Class': application.mainClass
     }
+    // Merge service files & ignore signature files to avoid conflicts
+    mergeServiceFiles()
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
 }
 
 /* === Checkstyle === */
@@ -82,4 +81,10 @@ tasks.withType(Checkstyle).configureEach {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+}
+
+/* === Gradle 'run' task === */
+run {
+    standardInput = System.in
+    enableAssertions = true
 }
