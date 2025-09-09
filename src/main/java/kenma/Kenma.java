@@ -5,6 +5,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Entry point and top-level coordinator of the Kenma/Duke application.
@@ -174,11 +176,10 @@ public class Kenma {
     }
 
     private String formatList(String header, List<Task> list) {
-        StringBuilder out = new StringBuilder(header).append('\n');
-        for (int i = 0; i < list.size(); i++) {
-            out.append(String.format("%d.%s%n", i + 1, list.get(i)));
-        }
-        return out.toString().trim();
+        String body = IntStream.range(0, list.size())
+                .mapToObj(i -> String.format("%d.%s", i + 1, list.get(i)))
+                .collect(Collectors.joining(System.lineSeparator()));
+        return header + System.lineSeparator() + body;
     }
 
     /** CLI main – optional. JavaFX uses Launcher to Main. */
