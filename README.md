@@ -86,3 +86,6 @@ mark abc                  -> Error: Please provide a valid integer index.
 
 - Chat bubble layout inspired by common JavaFX messenger UIs.
 - See `AI.md` for notes on AI-assisted coding (tools used, where they helped).
+
+## Download
+👉 [Latest Release (A-Release)](https://github.com/MousseDm/ip/releases)
