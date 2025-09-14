@@ -6,7 +6,7 @@ You can add todos, deadlines, and events; search, sort, and mark them done—fas
 > **Screenshot**  
 > The full app window (title bar with “Kenma”)
 >
-> <img src="./Ui.png" alt="Kenma UI screenshot" width="760"/>
+> <img src="./docs/Ui.png" alt="Kenma UI screenshot" width="760"/>
 
 ---
 
