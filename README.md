@@ -1,49 +1,88 @@
-# Kenma iP
+# Kenma — User Guide
 
-> “Kenma iP: making task management simple and fun!” – Anonymous  
+Kenma is a lightweight, friendly task chatbot with a clean JavaFX GUI.  
+You can add todos, deadlines, and events; search, sort, and mark them done—fast.
 
-Kenma iP is a **Java project template** based on the _Duke_ skeleton that helps you quickly get started with Java project development.  
-
-It is:  
-- text-based  
-- *easy to learn*  
-- ~~boring~~ **SUPER FAST** 🚀  
+> **Screenshot**  
+> The full app window (title bar with “Kenma”)
+>
+> <img src="./Ui.png" alt="Kenma UI screenshot" width="760"/>
 
 ---
 
 ## Quick Start
 
-All you need to do is:  
-1. Download the project.  
-2. Open it in IntelliJ IDEA.  
-3. Run `Kenma.main()`.  
-4. Add your tasks and let it manage them for you 😉  
+### Requirements
+- **Java 17** or newer
+- OS: Windows / macOS / Linux
 
----
+### Run (from a cloned repo)
+```bash
+java -jar build/libs/kenma-win.jar
+```
 
-## Setting up in IntelliJ
 
-**Prerequisites:** JDK 17, and the latest version of IntelliJ.  
+## How to Use
 
-1. Open IntelliJ (if you are not on the welcome screen, click `File` > `Close Project` to close the current project).  
-2. Import the project into IntelliJ:  
-   1. Click **Open**.  
-   2. Select the project directory, then click **OK**.  
-   3. Accept defaults for any further prompts.  
-3. Configure the project to use **JDK 17** (not other versions) as explained in the [official guide](https://www.jetbrains.com/help/idea/sdk.html#set-up-jdk).  
-   In the same dialog, set the **Project language level** field to `SDK default`.  
-4. Locate the file `src/main/java/Kenma.java`, right-click it, and choose `Run Kenma.main()`.  
-   If the setup is correct, you should see:  
+Kenma understands the commands below. **Extra spaces are OK** — Kenma normalizes whitespace.  
+Dates accept `yyyy-MM-dd HHmm` or `yyyy-MM-dd` (interpreted as 00:00).
 
-```java
- _  __ ______ _   _ __  __       
-| |/ /|  ____| \ | |  \/  |   /\ 
-| ' / | |__  |  \| | \  / |  /  \ 
-|  <  |  __| | . ` | |\/| | / /\ \
-| . \ | |____| |\  | |  | |/ ____ \
-|_|\_\|______|_| \_|_|  |_/_/    \_\
+| Command   | Format                                           | Example                                                |
+|-----------|--------------------------------------------------|--------------------------------------------------------|
+| **todo**  | `todo <description>`                             | `todo read CS2103T notes`                              |
+| **deadline** | `deadline <description> /by <date/time>`      | `deadline iP v1 /by 2025-10-01 2359`                  |
+| **event** | `event <description> /from <start> /to <end>`    | `event demo /from 2025-10-02 1400 /to 2025-10-02 1600`|
+| **list**  | `list`                                           | `list`                                                 |
+| **find**  | `find <keyword>`                                 | `find demo`                                            |
+| **on**    | `on <yyyy-MM-dd>`                                | `on 2025-10-01`                                        |
+| **sort**  | `sort by name` \| `sort by status` \| `sort by time` | `sort by time`                                       |
+| **mark**  | `mark <index>`                                   | `mark 2`                                               |
+| **unmark**| `unmark <index>`                                 | `unmark 2`                                             |
+| **delete**| `delete <index>`                                 | `delete 3`                                             |
+| **bye**   | `bye`                                            | `bye`                                                  |
 
-____________________________________________________________
- Hello! I'm Kenma
- What can I do for you?
-____________________________________________________________
+## Error Messages & Recovery
+
+Kenma is designed to fail gracefully and guide you back on track. Errors appear in the chat as a **red bubble**.
+
+- **Missing pieces** – e.g., no `/by` in a deadline → clear usage hint.
+- **Duplicate flags** – e.g., two `/by` parts → asks you to keep only one.
+- **Invalid dates** – wrong format or end ≤ start (for events) → explains the rule.
+- **Bad index** – non-number or out of range → shows the valid range.
+- **Duplicates** – adding the exact same task (same type/description/time) is blocked.
+- **Storage** – missing `data/` is created automatically; corrupt lines are skipped; saves are atomic.
+
+**Examples**
+```text
+deadline submit /by        -> Error: Missing '/by <date/time>'
+event demo /from 2025-10-02 1600 /to 2025-10-02 1400 -> Error: end must be after start
+mark abc                  -> Error: Please provide a valid integer index.
+```
+
+## Data File
+
+- Location: `data/kenma.txt`
+- Created automatically if missing (folder + file)
+- Robust loading: skips corrupt lines instead of crashing
+- Safe saving: writes to a temporary file and then replaces the original (atomic)
+- Portable: back up or copy `data/kenma.txt` to migrate your tasks
+
+## Tips
+
+- Press **Enter** to send; the **Send** button works too.
+- The window is resizable; messages auto-wrap to save space.
+- `sort by time` brings upcoming items to the top.
+- Use `find <keyword>` to filter a long list quickly.
+- Dates accept `yyyy-MM-dd HHmm` or `yyyy-MM-dd` (00:00 assumed).
+
+## About
+
+- **Product name:** Kenma  
+- **Platform:** Java 17, JavaFX  
+- **Executable JAR:** `build/libs/kenma-win.jar`  
+- **Data file:** `data/kenma.txt`
+
+## Credits
+
+- Chat bubble layout inspired by common JavaFX messenger UIs.
+- See `AI.md` for notes on AI-assisted coding (tools used, where they helped).
