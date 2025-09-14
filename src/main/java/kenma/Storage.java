@@ -63,28 +63,33 @@ public class Storage {
             switch (type) {
                 case "T": {
                     Todo t = new Todo(desc);
-                    if (isDone)
+                    if (isDone) {
                         t.markAsDone();
+                    }
                     return t;
                 }
                 case "D": {
-                    if (p.length < 4)
+                    if (p.length < 4) {
                         return null;
+                    }
                     Deadline d = new Deadline(desc, p[3]);
-                    if (isDone)
+                    if (isDone) {
                         d.markAsDone();
+                    }
                     return d;
                 }
                 case "E": {
                     if (p.length == 4) {
                         Event e = new Event(desc, p[3], "");
-                        if (isDone)
+                        if (isDone) {
                             e.markAsDone();
+                        }
                         return e;
                     } else if (p.length >= 5) {
                         Event e = new Event(desc, p[3], p[4]);
-                        if (isDone)
+                        if (isDone) {
                             e.markAsDone();
+                        }
                         return e;
                     } else {
                         return null;

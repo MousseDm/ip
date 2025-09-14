@@ -87,10 +87,13 @@ public class Event extends Task {
     }
 
     private String prettyDate(String raw, LocalDate d, LocalDateTime dt) {
-        if (dt != null)
+        if (dt != null) {
             return dt.format(FMT_DATETIME);
-        if (d != null)
+        }
+        if (d != null) {
             return d.format(FMT_DATE);
+        }
+
         return raw;
     }
 
