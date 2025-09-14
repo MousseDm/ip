@@ -22,11 +22,15 @@ public class Event extends Task {
 
     public Event(String description, String from, String to) {
         super(description, TaskType.EVENT);
-        assert from != null && !from.isBlank();
-        assert to != null && !to.isBlank();
+        if (from == null || from.isBlank()) {
+            throw new IllegalArgumentException("Event 'from' cannot be empty.");
+        }
+        if (to == null || to.isBlank()) {
+            throw new IllegalArgumentException("Event 'to' cannot be empty.");
+        }
         this.from = from;
         this.to = to;
-        parse();
+        parseAndValidate();
     }
 
     public String getFrom() {
@@ -37,9 +41,28 @@ public class Event extends Task {
         return to;
     }
 
+    public LocalDateTime getFromDateTime() {
+        return fromDateTime;
+    }
+
+    public LocalDate getFromDate() {
+        return fromDate;
+    }
+
+    public LocalDateTime getToDateTime() {
+        return toDateTime;
+    }
+
+    public LocalDate getToDate() {
+        return toDate;
+    }
+
     public boolean occursOn(LocalDate target) {
-        assert target != null;
-        boolean matchFrom = false, matchTo = false;
+        if (target == null) {
+            return false;
+        }
+        boolean matchFrom = false;
+        boolean matchTo = false;
         if (this.fromDateTime != null) {
             matchFrom = this.fromDateTime.toLocalDate().equals(target);
         } else if (this.fromDate != null) {
@@ -53,35 +76,51 @@ public class Event extends Task {
         return matchFrom || matchTo;
     }
 
-    private void parse() {
+    private void parseAndValidate() {
         this.fromDate = null;
         this.fromDateTime = null;
         this.toDate = null;
         this.toDateTime = null;
 
-        if (from != null && !from.isBlank()) {
-            try {
-                this.fromDateTime = LocalDateTime.parse(from.trim(),
-                        DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm"));
-            } catch (DateTimeParseException ignored) {
-                try {
-                    this.fromDate = LocalDate.parse(from.trim(),
-                            DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                } catch (DateTimeParseException ignored2) {
-                }
-            }
-        }
+        parseInto(from.trim(), true);
+        parseInto(to.trim(), false);
 
-        if (to != null && !to.isBlank()) {
+        LocalDateTime start = (fromDateTime != null)
+                ? fromDateTime
+                : (fromDate != null ? fromDate.atStartOfDay() : null);
+        LocalDateTime end = (toDateTime != null)
+                ? toDateTime
+                : (toDate != null ? toDate.atStartOfDay() : null);
+
+        if (start == null || end == null) {
+            throw new IllegalArgumentException("Event time(s) invalid: cannot parse 'from' or 'to'.");
+        }
+        if (!end.isAfter(start)) {
+            throw new IllegalArgumentException("Event end time must be AFTER start time.");
+        }
+    }
+
+    private void parseInto(String raw, boolean isFrom) {
+        if (raw == null || raw.isBlank()) {
+            return;
+        }
+        try {
+            LocalDateTime dt = LocalDateTime.parse(raw, DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm"));
+            if (isFrom) {
+                this.fromDateTime = dt;
+            } else {
+                this.toDateTime = dt;
+            }
+        } catch (DateTimeParseException ignored) {
             try {
-                this.toDateTime = LocalDateTime.parse(to.trim(),
-                        DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm"));
-            } catch (DateTimeParseException ignored) {
-                try {
-                    this.toDate = LocalDate.parse(to.trim(),
-                            DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                } catch (DateTimeParseException ignored2) {
+                LocalDate d = LocalDate.parse(raw, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                if (isFrom) {
+                    this.fromDate = d;
+                } else {
+                    this.toDate = d;
                 }
+            } catch (DateTimeParseException ignored2) {
+                // leave null; validated later
             }
         }
     }
@@ -93,16 +132,30 @@ public class Event extends Task {
         if (d != null) {
             return d.format(FMT_DATE);
         }
-
         return raw;
     }
 
-    public java.time.LocalDateTime getFromDateTime() {
-        return fromDateTime;
+    /** Contribute time keys for duplicate detection (see Task.equals). */
+    @Override
+    protected String keyStart() {
+        if (fromDateTime != null) {
+            return fromDateTime.toString();
+        }
+        if (fromDate != null) {
+            return fromDate.atStartOfDay().toString();
+        }
+        return from.trim().toLowerCase();
     }
 
-    public java.time.LocalDate getFromDate() {
-        return fromDate;
+    @Override
+    protected String keyEnd() {
+        if (toDateTime != null) {
+            return toDateTime.toString();
+        }
+        if (toDate != null) {
+            return toDate.atStartOfDay().toString();
+        }
+        return to.trim().toLowerCase();
     }
 
     @Override

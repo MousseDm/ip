@@ -95,11 +95,14 @@ public class MainWindow {
 
         try {
             String reply = (responder == null) ? "(engine not wired)" : responder.apply(input);
+            // Engine now prefixes "Error: " for user-friendly errors; still guard here.
             if (looksLikeError(reply)) {
                 dialogContainer.getItems().add(DialogBox.getErrorDialog(reply, botImage));
             } else {
                 dialogContainer.getItems().add(DialogBox.getDukeDialog(reply, botImage));
             }
+        } catch (DukeException de) {
+            dialogContainer.getItems().add(DialogBox.getErrorDialog("Error: " + de.getMessage(), botImage));
         } catch (Exception e) {
             String msg = (e.getMessage() == null || e.getMessage().isBlank())
                     ? "Unknown error."

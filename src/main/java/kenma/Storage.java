@@ -1,10 +1,8 @@
 package kenma;
 
 import java.io.BufferedWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,39 +12,77 @@ public class Storage {
     private final Path file;
 
     public Storage(String filePath) {
-        assert filePath != null && !filePath.isBlank();
+        if (filePath == null || filePath.isBlank()) {
+            throw new IllegalArgumentException("File path cannot be empty.");
+        }
         this.file = Paths.get(filePath);
     }
 
-    public List<Task> load() throws IOException {
-        assert file != null;
-        if (!Files.exists(file)) {
-            return new ArrayList<>();
-        }
-        List<String> lines = Files.readAllLines(file);
-        List<Task> tasks = new ArrayList<>();
-        for (String line : lines) {
-            Task t = decode(line);
-            if (t != null) {
-                tasks.add(t);
+    public List<Task> load() {
+        try {
+            if (!Files.exists(file)) {
+                Path parent = file.getParent();
+                if (parent != null) {
+                    Files.createDirectories(parent);
+                }
+                Files.createFile(file);
+                return new ArrayList<>();
             }
+            List<String> lines = Files.readAllLines(file, StandardCharsets.UTF_8);
+            List<Task> tasks = new ArrayList<>();
+            int lineNo = 0;
+            for (String line : lines) {
+                lineNo++;
+                if (line == null || line.isBlank()) {
+                    continue;
+                }
+                try {
+                    Task t = decode(line);
+                    if (t != null) {
+                        tasks.add(t);
+                    }
+                } catch (Exception ex) {
+                    System.err.println("[WARN] Ignore corrupt line " + lineNo + ": " + ex.getMessage());
+                }
+            }
+            return tasks;
+        } catch (AccessDeniedException ade) {
+            throw new DukeException("Access denied to data file: " + file);
+        } catch (Exception e) {
+            throw new DukeException("Failed to load data from: " + file + " (" + e.getMessage() + ")");
         }
-        assert tasks != null;
-        return tasks;
     }
 
-    public void save(List<Task> tasks) throws IOException {
-        assert tasks != null;
-        Files.createDirectories(file.getParent());
-        try (BufferedWriter bw = Files.newBufferedWriter(file)) {
-            for (Task t : tasks) {
-                String s = encode(t);
-                assert s != null;
-                bw.write(s);
-                bw.newLine();
-            }
+    public void save(List<Task> tasks) {
+        if (tasks == null) {
+            throw new IllegalArgumentException("Tasks cannot be null.");
         }
-        assert Files.exists(file);
+        try {
+            Path parent = file.getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }
+            Path tmp = file.resolveSibling(file.getFileName() + ".tmp");
+            try (BufferedWriter bw = Files.newBufferedWriter(tmp, StandardCharsets.UTF_8,
+                    StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
+                for (Task t : tasks) {
+                    String s = encode(t);
+                    if (s != null) {
+                        bw.write(s);
+                        bw.newLine();
+                    }
+                }
+            }
+            try {
+                Files.move(tmp, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            } catch (AtomicMoveNotSupportedException ignore) {
+                Files.move(tmp, file, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } catch (AccessDeniedException ade) {
+            throw new DukeException("Access denied when saving to: " + file);
+        } catch (Exception e) {
+            throw new DukeException("Failed to save to: " + file + " (" + e.getMessage() + ")");
+        }
     }
 
     private Task decode(String line) {
@@ -79,24 +115,21 @@ public class Storage {
                     return d;
                 }
                 case "E": {
-                    if (p.length == 4) {
-                        Event e = new Event(desc, p[3], "");
-                        if (isDone) {
-                            e.markAsDone();
-                        }
-                        return e;
-                    } else if (p.length >= 5) {
+                    if (p.length >= 5) {
                         Event e = new Event(desc, p[3], p[4]);
                         if (isDone) {
                             e.markAsDone();
                         }
                         return e;
+                    } else if (p.length == 4) {
+                        return null;
                     } else {
                         return null;
                     }
                 }
-                default:
+                default: {
                     return null;
+                }
             }
         } catch (Exception ex) {
             return null;
@@ -112,9 +145,6 @@ public class Storage {
             return "D | " + flag + " | " + d.getDescription() + " | " + d.getBy();
         } else if (t instanceof Event) {
             Event e = (Event) t;
-            if (e.getTo() == null || e.getTo().isEmpty()) {
-                return "E | " + flag + " | " + e.getDescription() + " | " + e.getFrom();
-            }
             return "E | " + flag + " | " + e.getDescription() + " | " + e.getFrom() + " | " + e.getTo();
         } else {
             return null;

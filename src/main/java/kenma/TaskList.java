@@ -13,13 +13,13 @@ public class TaskList {
 
     public TaskList() {
         this.tasks = new ArrayList<>();
-        assert this.tasks != null;
     }
 
     public TaskList(List<Task> init) {
-        assert init != null;
+        if (init == null) {
+            throw new IllegalArgumentException("Initial list cannot be null.");
+        }
         this.tasks = new ArrayList<>(init);
-        assert this.tasks != null;
     }
 
     /** Read-only view to prevent representation exposure. */
@@ -31,23 +31,32 @@ public class TaskList {
         return tasks.size();
     }
 
+    /** 1-based index access with error handling. */
     public Task get(int idx1Based) {
-        assert idx1Based > 0 && idx1Based <= tasks.size();
+        ensureIndex(idx1Based);
         return tasks.get(idx1Based - 1);
     }
 
+    /** Prevent duplicate tasks (semantic equality). */
     public void add(Task t) {
-        assert t != null;
+        if (t == null) {
+            throw new IllegalArgumentException("Task cannot be null.");
+        }
+        if (tasks.contains(t)) {
+            throw new DukeException("Duplicate task: " + t);
+        }
         tasks.add(t);
     }
 
     public Task remove(int idx1Based) {
-        assert idx1Based > 0 && idx1Based <= tasks.size();
+        ensureIndex(idx1Based);
         return tasks.remove(idx1Based - 1);
     }
 
     public List<Task> find(String keyword) {
-        assert keyword != null && !keyword.isBlank();
+        if (keyword == null || keyword.isBlank()) {
+            throw new DukeException("Keyword for find cannot be empty.");
+        }
         String needle = keyword.toLowerCase();
         return tasks.stream()
                 .filter(t -> {
@@ -57,4 +66,9 @@ public class TaskList {
                 .toList();
     }
 
+    private void ensureIndex(int idx1Based) {
+        if (idx1Based <= 0 || idx1Based > tasks.size()) {
+            throw new DukeException("Index out of range. Valid range: 1.." + tasks.size() + ".");
+        }
+    }
 }

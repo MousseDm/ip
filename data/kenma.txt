@@ -6,8 +6,7 @@ E | 0 | seminar | 2019-12-02 1800 | 2019-12-02 2000
 T | 0 | read book
 T | 0 | read book
 D | 0 | submit assignment | Monday
-E | 0 | project meeting | 2pm | 4pm
 T | 0 | read book
 D | 0 | submit assignment | Monday
-E | 0 | project meeting | 2pm | 4pm
 T | 0 | odoro
+T | 0 | presentation

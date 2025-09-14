@@ -4,30 +4,18 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
  * Entry point and top-level coordinator of the Kenma/Duke application.
- *
- * Responsibilities:
- * - Initialize UI, storage, and task list
- * - Run the REPL loop to read/parse/execute commands (CLI)
- * - Provide a single-turn response method for GUI
- * - Persist changes to disk
  */
 public class Kenma {
     private final Ui ui;
     private final Storage storage;
     private final TaskList tasks;
 
-    /**
-     * Creates an application instance that uses the given save file path.
-     *
-     * NOTE: must be public so the JavaFX app can create and reuse a single engine.
-     */
     public Kenma(String filePath) {
         this.ui = new Ui();
         this.storage = new Storage(filePath);
@@ -38,17 +26,9 @@ public class Kenma {
             loaded = new TaskList();
         }
         this.tasks = loaded;
-        assert ui != null;
-        assert storage != null;
-        assert tasks != null;
     }
 
-    /* ===================== GUI ENTRY (SINGLE-TURN) ====================== */
-
-    /**
-     * Returns a single response string for a single user input.
-     * Used by the JavaFX GUI (no printing; everything returned as text).
-     */
+    /** GUI single-turn response. */
     public String getResponse(String input) {
         if (input == null || input.isBlank()) {
             return "";
@@ -101,11 +81,17 @@ public class Kenma {
                     return formatList(String.format("Here are the matching tasks containing \"%s\":", p.a), matches);
                 }
 
+                case SORT: {
+                    String mode = (p.a == null) ? "" : p.a;
+                    List<Task> sorted = sortTasks(mode);
+                    return formatList("Sorted tasks (" + mode + "):", sorted);
+                }
+
                 default:
                     return "";
             }
         } catch (DukeException e) {
-            return e.getMessage();
+            return "Error: " + e.getMessage();
         }
     }
 
@@ -129,7 +115,7 @@ public class Kenma {
             boolean found = false;
             sb.append("Tasks on ").append(target).append(":\n");
             for (int i = 0; i < tasks.size(); i++) {
-                Task t = tasks.get(i);
+                Task t = tasks.get(i + 1); // TaskList#get is 1-based
                 if (t instanceof Deadline && ((Deadline) t).occursOn(target)) {
                     sb.append(String.format(" %d.%s%n", i + 1, t));
                     found = true;
@@ -151,11 +137,13 @@ public class Kenma {
         return tasks.all().stream()
                 .sorted((a, b) -> {
                     switch (mode) {
-                        case "by name":
+                        case "by name": {
                             return a.getDescription().compareToIgnoreCase(b.getDescription());
-                        case "by status":
+                        }
+                        case "by status": {
                             return Boolean.compare(a.isDone(), b.isDone());
-                        case "by time":
+                        }
+                        case "by time": {
                             LocalDateTime ta = extractDateTime(a);
                             LocalDateTime tb = extractDateTime(b);
                             if (ta == null && tb == null) {
@@ -168,8 +156,10 @@ public class Kenma {
                                 return -1;
                             }
                             return ta.compareTo(tb);
-                        default:
+                        }
+                        default: {
                             return 0;
+                        }
                     }
                 })
                 .toList();
@@ -197,8 +187,11 @@ public class Kenma {
         return null;
     }
 
+    /** Validate 1-based index string and return it as int. */
     private int requireValidIndex(String raw, int size) throws DukeException {
-        assert raw != null && !raw.isBlank();
+        if (raw == null || raw.isBlank()) {
+            throw new DukeException("Please provide an index.");
+        }
         int idx;
         try {
             idx = Integer.parseInt(raw.trim());
@@ -208,7 +201,6 @@ public class Kenma {
         if (idx < 1 || idx > size) {
             throw new DukeException("Index out of range. Valid range: 1.." + size + ".");
         }
-        assert idx >= 1 && idx <= size;
         return idx;
     }
 
@@ -227,19 +219,22 @@ public class Kenma {
     }
 
     private String formatList(String header, List<Task> list) {
+        if (list.isEmpty()) {
+            return header + System.lineSeparator() + "(no tasks)";
+        }
         String body = IntStream.range(0, list.size())
                 .mapToObj(i -> String.format("%d.%s", i + 1, list.get(i)))
                 .collect(Collectors.joining(System.lineSeparator()));
         return header + System.lineSeparator() + body;
     }
 
-    /** CLI main – optional. JavaFX uses Launcher to Main. */
+    /** CLI main – optional. */
     public static void main(String[] args) {
         String path = (args.length > 0) ? args[0] : "data/kenma.txt";
         new Kenma(path).run();
     }
 
-    /** Classic CLI run loop (kept for compatibility). Not used by JavaFX. */
+    /** Classic CLI run loop. */
     private void run() {
         String logo = " _  __ ______ _   _ __  __       \n"
                 + "| |/ /|  ____| \\ | |  \\/  |   /\\ \n"
@@ -319,8 +314,7 @@ public class Kenma {
                     }
                     case SORT: {
                         String mode = (p.a == null) ? "" : p.a;
-                        List<Task> sorted = sortTasks(mode);
-                        ui.showList(sorted);
+                        ui.showList(sortTasks(mode));
                         break;
                     }
                     default:
