@@ -19,6 +19,7 @@ You can add todos, deadlines, and events; search, sort, and mark them done—fas
 ### Run (from a cloned repo)
 ```bash
 java -jar build/libs/kenma-win.jar
+```
 
 
 ## How to Use
@@ -56,9 +57,8 @@ Kenma is designed to fail gracefully and guide you back on track. Errors appear 
 deadline submit /by        -> Error: Missing '/by <date/time>'
 event demo /from 2025-10-02 1600 /to 2025-10-02 1400 -> Error: end must be after start
 mark abc                  -> Error: Please provide a valid integer index.
+```
 
-
-```markdown
 ## Data File
 
 - Location: `data/kenma.txt`
