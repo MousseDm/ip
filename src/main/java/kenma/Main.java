@@ -16,21 +16,26 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        // Init core
         engine = new Kenma("data/kenma.txt");
 
+        // Load UI
         FXMLLoader fxml = new FXMLLoader(Main.class.getResource("/view/MainWindow.fxml"));
         AnchorPane root = fxml.load();
-        assert root != null;
-
         MainWindow controller = fxml.getController();
-        assert controller != null;
 
-        controller.showGreeting(engine.getGreeting());
+        // Wire controller
         controller.setResponder(engine::getResponse);
+        controller.setTitle("Kenma"); // header label text
+        controller.showGreeting(engine.getGreeting()); // initial bot message
 
-        stage.setScene(new Scene(root));
+        // Stage/scene
+        Scene scene = new Scene(root);
         stage.setTitle("Kenma");
+        stage.setMinWidth(360);
+        stage.setMinHeight(480);
+        stage.setResizable(true);
+        stage.setScene(scene);
         stage.show();
     }
-
 }

@@ -1,41 +1,63 @@
 package kenma;
 
 import java.util.function.Function;
+
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 
-/**
- * Controller for MainWindow.fxml.
- * It delegates user input to a responder function and displays both sides.
- */
 public class MainWindow {
 
     @FXML
-    private ListView<DialogBox> dialogContainer; // 改：ListView<String> -> ListView<DialogBox>
+    private Label titleLabel;
+
+    @FXML
+    private ListView<DialogBox> dialogContainer;
+
     @FXML
     private TextField userInput;
+
     @FXML
     private Button sendButton;
 
-    /** A function that takes user input and returns the bot's reply. */
     private Function<String, String> responder;
 
-    private final Image userImage = loadImageOrNull("/images/DaUser.png"); // or "/images/User.png"
-    private final Image botImage = loadImageOrNull("/images/DaDuke.png"); // or "/images/Duke.png"
+    private final Image userImage = loadImageOrNull("/images/DaUser.png");
+    private final Image botImage = loadImageOrNull("/images/DaDuke.png");
 
     private static Image loadImageOrNull(String path) {
         try {
             var is = MainWindow.class.getResourceAsStream(path);
             return is == null ? null : new Image(is);
-        } catch (Exception ignore) {
+        } catch (Exception e) {
             return null;
         }
     }
 
-    /** Called by Main after FXML load to wire the chatbot core. */
     public void setResponder(Function<String, String> responder) {
         this.responder = responder;
+    }
+
+    public void setTitle(String title) {
+        if (titleLabel != null) {
+            titleLabel.setText(title);
+        }
+    }
+
+    public void addThemeStylesheet(String cssClasspath) {
+        if (cssClasspath == null || cssClasspath.isBlank()) {
+            return;
+        }
+        sendButton.sceneProperty().addListener((obs, oldScene, scene) -> {
+            if (scene != null) {
+                scene.getStylesheets().add(cssClasspath);
+            }
+        });
     }
 
     public void showGreeting(String text) {
@@ -52,14 +74,14 @@ public class MainWindow {
             protected void updateItem(DialogBox item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(null);
-                setGraphic(empty || item == null ? null : item);
+                setGraphic((empty || item == null) ? null : item);
             }
         });
         dialogContainer.setPlaceholder(new Label(""));
 
-        dialogContainer.getItems().addListener(
-                (javafx.collections.ListChangeListener<DialogBox>) c -> dialogContainer
-                        .scrollTo(dialogContainer.getItems().size() - 1));
+        dialogContainer.getItems().addListener((ListChangeListener<DialogBox>) c -> {
+            dialogContainer.scrollTo(dialogContainer.getItems().size() - 1);
+        });
     }
 
     @FXML
@@ -88,7 +110,10 @@ public class MainWindow {
         }
 
         if ("bye".equalsIgnoreCase(input.trim())) {
-            sendButton.getScene().getWindow().hide();
+            var scene = sendButton.getScene();
+            if (scene != null && scene.getWindow() != null) {
+                scene.getWindow().hide();
+            }
         }
     }
 
