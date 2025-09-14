@@ -1,0 +1,53 @@
+.root {
+    -fx-font-family: "Segoe UI", "Helvetica Neue", Arial;
+    -fx-font-size: 13px;
+}
+
+#dialogContainer {
+    -fx-padding: 8 10 8 10;
+    -fx-background-color: transparent;
+}
+
+.dialog-row {
+    -fx-padding: 6 0 6 0;
+}
+
+.bubble {
+    -fx-background-radius: 14;
+    -fx-padding: 8 12 8 12;
+    -fx-wrap-text: true;
+    -fx-max-width: 520;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 8, 0.2, 0, 1);
+}
+
+.user-bubble {
+    -fx-background-color: linear-gradient(to bottom, #cfe9ff, #b7dbff);
+    -fx-text-fill: #0b2a3f;
+    -fx-alignment: CENTER_RIGHT;
+}
+
+.duke-bubble {
+    -fx-background-color: #f2f3f5;
+    -fx-text-fill: #1f2328;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.error-bubble {
+    -fx-background-color: #fff2f2;
+    -fx-border-color: #ff4d4f;
+    -fx-border-width: 1;
+    -fx-text-fill: #a8071a;
+}
+
+.avatar {
+    -fx-fit-width: 34;
+    -fx-fit-height: 34;
+}
+
+.row-right {
+    -fx-alignment: CENTER_RIGHT;
+}
+
+.row-left {
+    -fx-alignment: CENTER_LEFT;
+}

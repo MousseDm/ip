@@ -48,19 +48,25 @@ public class Deadline extends Task {
     }
 
     private String pretty() {
-        if (dateTime != null)
+        if (dateTime != null) {
             return dateTime.format(FMT_DATETIME);
-        if (date != null)
+        }
+
+        if (date != null) {
             return date.format(FMT_DATE);
+        }
         return by;
     }
 
     public boolean occursOn(LocalDate target) {
         assert target != null;
-        if (this.dateTime != null)
+        if (this.dateTime != null) {
             return this.dateTime.toLocalDate().equals(target);
-        if (this.date != null)
+        }
+        if (this.date != null) {
             return this.date.equals(target);
+        }
+
         return false;
     }
 

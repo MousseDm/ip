@@ -55,13 +55,12 @@ test {
 
 /* === Shadow JAR config === */
 tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-    archiveBaseName.set('duke')
-    archiveVersion.set('')          // omit version in file name
-    archiveClassifier.set(targetOs) // e.g., duke-w in / duke-mac / duke-linux
+    archiveBaseName.set('kenma')      // <-- was 'duke'
+    archiveVersion.set('')            // no version suffix
+    archiveClassifier.set(targetOs)   // keeps OS suffix, e.g. kenma-win.jar
     manifest {
-        attributes 'Main-Class': application.mainClass
+        attributes 'Main-Class': 'kenma.Launcher'  // be explicit
     }
-    // Merge service files & ignore signature files to avoid conflicts
     mergeServiceFiles()
     exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
 }

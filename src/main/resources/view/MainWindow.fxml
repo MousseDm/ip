@@ -6,13 +6,14 @@
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="kenma.MainWindow"
+            stylesheets="@styles.css"
             prefHeight="420.0" prefWidth="320.0">
     <children>
         <VBox spacing="6.0" AnchorPane.topAnchor="8.0" AnchorPane.bottomAnchor="8.0"
               AnchorPane.leftAnchor="8.0" AnchorPane.rightAnchor="8.0">
             <children>
                 <Label text="Kenma" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
-                <ListView fx:id="dialogContainer" prefHeight="340.0"/>
+                <ListView fx:id="dialogContainer" VBox.vgrow="ALWAYS"/>
                 <HBox spacing="6.0">
                     <children>
                         <TextField fx:id="userInput" HBox.hgrow="ALWAYS" promptText="Type a message..."/>

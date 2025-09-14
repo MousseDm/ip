@@ -158,12 +158,15 @@ public class Kenma {
                         case "by time":
                             LocalDateTime ta = extractDateTime(a);
                             LocalDateTime tb = extractDateTime(b);
-                            if (ta == null && tb == null)
+                            if (ta == null && tb == null) {
                                 return 0;
-                            if (ta == null)
+                            }
+                            if (ta == null) {
                                 return 1;
-                            if (tb == null)
+                            }
+                            if (tb == null) {
                                 return -1;
+                            }
                             return ta.compareTo(tb);
                         default:
                             return 0;
@@ -175,17 +178,21 @@ public class Kenma {
     private LocalDateTime extractDateTime(Task t) {
         if (t instanceof Deadline) {
             Deadline d = (Deadline) t;
-            if (d.getDueDateTime() != null)
+            if (d.getDueDateTime() != null) {
                 return d.getDueDateTime();
-            if (d.getDueDate() != null)
+            }
+            if (d.getDueDate() != null) {
                 return d.getDueDate().atStartOfDay();
+            }
         }
         if (t instanceof Event) {
             Event e = (Event) t;
-            if (e.getFromDateTime() != null)
+            if (e.getFromDateTime() != null) {
                 return e.getFromDateTime();
-            if (e.getFromDate() != null)
+            }
+            if (e.getFromDate() != null) {
                 return e.getFromDate().atStartOfDay();
+            }
         }
         return null;
     }

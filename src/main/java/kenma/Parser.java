@@ -5,14 +5,17 @@ public class Parser {
         assert input != null;
 
         String s = input.trim();
-        if (s.isEmpty())
+        if (s.isEmpty()) {
             throw new DukeException("Empty command.");
+        }
 
         String lower = s.toLowerCase();
-        if (lower.equals("bye"))
+        if (lower.equals("bye")) {
             return new Parsed(Command.BYE);
-        if (lower.equals("list"))
+        }
+        if (lower.equals("list")) {
             return new Parsed(Command.LIST);
+        }
         if (lower.startsWith("mark ")) {
             String arg = s.substring(5).trim();
             assert !arg.isEmpty();
@@ -38,13 +41,15 @@ public class Parser {
         if (lower.startsWith("deadline")) {
             String body = s.substring(8).trim();
             int byPos = body.toLowerCase().indexOf("/by");
-            if (byPos < 0)
+            if (byPos < 0) {
                 throw new DukeException("Missing '/by'. Usage: deadline <desc> /by <when>");
+            }
             String desc = body.substring(0, byPos).trim();
             String by = body.substring(byPos + 3).trim();
             assert desc != null && by != null;
-            if (desc.isEmpty() || by.isEmpty())
+            if (desc.isEmpty() || by.isEmpty()) {
                 throw new DukeException("Both description and '/by <when>' are required.");
+            }
             return new Parsed(Command.DEADLINE, desc, by);
         }
         if (lower.startsWith("event")) {
@@ -52,14 +57,16 @@ public class Parser {
             String low = body.toLowerCase();
             int fromPos = low.indexOf("/from");
             int toPos = low.indexOf("/to");
-            if (fromPos < 0 || toPos < 0 || toPos <= fromPos)
+            if (fromPos < 0 || toPos < 0 || toPos <= fromPos) {
                 throw new DukeException("Event must be 'event <desc> /from <start> /to <end>'.");
+            }
             String desc = body.substring(0, fromPos).trim();
             String from = body.substring(fromPos + 5, toPos).trim();
             String to = body.substring(toPos + 3).trim();
             assert desc != null && from != null && to != null;
-            if (desc.isEmpty() || from.isEmpty() || to.isEmpty())
+            if (desc.isEmpty() || from.isEmpty() || to.isEmpty()) {
                 throw new DukeException("Event requires description, from and to.");
+            }
             return new Parsed(Command.EVENT, desc, from, to);
         }
         if (lower.startsWith("on ")) {
