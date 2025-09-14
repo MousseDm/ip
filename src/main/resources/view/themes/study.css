@@ -1,0 +1,22 @@
+/* Subtle calm blue/green theme */
+.root {
+    -fx-font-smoothing-type: lcd;
+}
+
+.duke-bubble {
+    /* bot bubble */
+    -fx-background-color: linear-gradient(to bottom, #eef6ff, #e3f1ff);
+    -fx-text-fill: #0f172a;
+    -fx-effect: dropshadow(gaussian, rgba(24, 119, 242, 0.12), 10, 0.2, 0, 1);
+}
+
+.user-bubble {
+    /* you bubble (optional slight tweak) */
+    -fx-background-color: linear-gradient(to bottom, #e6fffa, #d1fae5);
+}
+
+.error-bubble {
+    -fx-background-color: #fff1f2;
+    -fx-border-color: #fb7185;
+    -fx-text-fill: #9f1239;
+}

@@ -34,8 +34,9 @@ public class Parser {
         if (lower.startsWith("todo")) {
             String desc = s.length() > 4 ? s.substring(4).trim() : "";
             assert desc != null;
-            if (desc.isEmpty())
+            if (desc.isEmpty()) {
                 throw new DukeException("The description of a todo cannot be empty.");
+            }
             return new Parsed(Command.TODO, desc);
         }
         if (lower.startsWith("deadline")) {
