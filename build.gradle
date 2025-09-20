@@ -2,87 +2,152 @@ plugins {
     id 'java'
     id 'application'
     id 'checkstyle'
+    id 'org.openjfx.javafxplugin' version '0.1.0'      // ensures JavaFX on compile/runtime
     id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
+import org.gradle.api.attributes.Usage
+import org.gradle.api.attributes.LibraryElements
+import org.gradle.api.attributes.Bundling
+
+java { toolchain { languageVersion = JavaLanguageVersion.of(17) } }
+repositories { mavenCentral() }
+
+def fxv = '17.0.7'
+
+application { mainClass = 'kenma.Launcher' }
+
+/* --- Make JavaFX available during compile & gradlew run --- */
+javafx {
+    version = fxv
+    modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls', 'javafx.fxml' ]
 }
-
-repositories {
-    mavenCentral()
-}
-
-def javafxVersion = '17.0.7'
-
-// Determine target OS for JavaFX natives.
-// Use:  ./gradlew clean shadowJar -Pos=win   (or mac / linux)
-// Default: detect from current JVM if -Pos not given.
-def osProp = findProperty("os")?.toString()
-def currentOs = org.gradle.internal.os.OperatingSystem.current()
-def detectedOs = currentOs.isWindows() ? "win" : (currentOs.isMacOsX() ? "mac" : "linux")
-def targetOs = (osProp in ["win","mac","linux"]) ? osProp : detectedOs
 
 dependencies {
-    implementation "org.openjfx:javafx-base:${javafxVersion}:${targetOs}"
-    implementation "org.openjfx:javafx-controls:${javafxVersion}:${targetOs}"
-    implementation "org.openjfx:javafx-fxml:${javafxVersion}:${targetOs}"
-    implementation "org.openjfx:javafx-graphics:${javafxVersion}:${targetOs}"
+    // Classifier-less API jars → compile sees javafx.* packages
+    implementation "org.openjfx:javafx-base:${fxv}"
+    implementation "org.openjfx:javafx-graphics:${fxv}"
+    implementation "org.openjfx:javafx-controls:${fxv}"
+    implementation "org.openjfx:javafx-fxml:${fxv}"
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testRuntimeOnly   'org.junit.platform:junit-platform-launcher:1.10.2'
 }
 
-application {
-    // Your launcher class:
-    mainClass = "kenma.Launcher"
-    // (Note: enableAssertions here affects `gradlew run`, not the JAR.)
-}
-
 sourceSets {
     main {
         java.srcDirs = ['src/main/java']
-        resources.srcDirs = ['src/main/resources']
+        resources {
+            // Also package your avatar at /ip/kenma.png
+            srcDirs = ['src/main/resources', 'ip']
+        }
     }
 }
 
-/* === Tests === */
-test {
-    useJUnitPlatform()
-}
+test { useJUnitPlatform() }
 
-/* === Shadow JAR config === */
-tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-    archiveBaseName.set('kenma')      // <-- was 'duke'
-    archiveVersion.set('')            // no version suffix
-    archiveClassifier.set(targetOs)   // keeps OS suffix, e.g. kenma-win.jar
-    manifest {
-        attributes 'Main-Class': 'kenma.Launcher'  // be explicit
-    }
-    mergeServiceFiles()
-    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
-}
-
-/* === Checkstyle === */
 checkstyle {
     toolVersion = '10.12.4'
     configFile = file('config/checkstyle/checkstyle.xml')
     configProperties = ["suppressionFile": file('config/checkstyle/suppressions.xml')]
 }
 tasks.withType(Checkstyle).configureEach {
-    reports {
-        html.required = true
-        xml.required  = false
+    reports { html.required = true; xml.required = false }
+}
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+
+/* --- Pull platform-specific natives so ONE shaded jar works on any OS --- */
+configurations {
+    fxWin {
+        canBeConsumed = false
+        canBeResolved = true
+        attributes {
+            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, Usage.JAVA_RUNTIME))
+            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements, LibraryElements.JAR))
+            attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling, Bundling.EXTERNAL))
+        }
+    }
+    fxMac {
+        canBeConsumed = false
+        canBeResolved = true
+        attributes {
+            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, Usage.JAVA_RUNTIME))
+            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements, LibraryElements.JAR))
+            attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling, Bundling.EXTERNAL))
+        }
+    }
+    fxLinuxX64 {
+        canBeConsumed = false
+        canBeResolved = true
+        attributes {
+            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, Usage.JAVA_RUNTIME))
+            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements, LibraryElements.JAR))
+            attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling, Bundling.EXTERNAL))
+        }
+    }
+    fxLinuxArm {
+        canBeConsumed = false
+        canBeResolved = true
+        attributes {
+            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, Usage.JAVA_RUNTIME))
+            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements, LibraryElements.JAR))
+            attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling, Bundling.EXTERNAL))
+        }
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
+
+dependencies {
+    // Windows
+    fxWin "org.openjfx:javafx-base:${fxv}:win"
+    fxWin "org.openjfx:javafx-graphics:${fxv}:win"
+    fxWin "org.openjfx:javafx-controls:${fxv}:win"
+    fxWin "org.openjfx:javafx-fxml:${fxv}:win"
+
+    // macOS (JFX 17 is universal)
+    fxMac "org.openjfx:javafx-base:${fxv}:mac"
+    fxMac "org.openjfx:javafx-graphics:${fxv}:mac"
+    fxMac "org.openjfx:javafx-controls:${fxv}:mac"
+    fxMac "org.openjfx:javafx-fxml:${fxv}:mac"
+
+    // Linux x86_64
+    fxLinuxX64 "org.openjfx:javafx-base:${fxv}:linux"
+    fxLinuxX64 "org.openjfx:javafx-graphics:${fxv}:linux"
+    fxLinuxX64 "org.openjfx:javafx-controls:${fxv}:linux"
+    fxLinuxX64 "org.openjfx:javafx-fxml:${fxv}:linux"
+
+    // Linux ARM64 (aarch64)
+    fxLinuxArm "org.openjfx:javafx-base:${fxv}:linux-aarch64"
+    fxLinuxArm "org.openjfx:javafx-graphics:${fxv}:linux-aarch64"
+    fxLinuxArm "org.openjfx:javafx-controls:${fxv}:linux-aarch64"
+    fxLinuxArm "org.openjfx:javafx-fxml:${fxv}:linux-aarch64"
 }
 
-/* === Gradle 'run' task === */
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
+tasks.named('shadowJar', ShadowJar) {
+    archiveBaseName.set('kenma')
+    archiveVersion.set('')
+    archiveClassifier.set('')
+    manifest { attributes 'Main-Class': 'kenma.Launcher' }
+
+    from sourceSets.main.output
+
+    configurations = [
+        project.configurations.runtimeClasspath,
+        project.configurations.fxWin,
+        project.configurations.fxMac,
+        project.configurations.fxLinuxX64,
+        project.configurations.fxLinuxArm
+    ]
+
+    mergeServiceFiles()
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+    // do NOT minimize
+}
+
+
+/* --- Dev convenience --- */
 run {
     standardInput = System.in
     enableAssertions = true

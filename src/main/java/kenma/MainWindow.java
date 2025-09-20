@@ -27,8 +27,18 @@ public class MainWindow {
 
     private Function<String, String> responder;
 
-    private final Image userImage = loadImageOrNull("/images/DaUser.png");
-    private final Image botImage = loadImageOrNull("/images/DaDuke.png");
+    private final Image userImage = mustLoad("/images/User.png");
+    private final Image botImage = mustLoad("/images/kenma.png");
+
+    private static Image mustLoad(String path) {
+        var url = MainWindow.class.getResource(path);
+        if (url == null) {
+            System.err.println("[Avatar] NOT FOUND: " + path);
+            throw new IllegalStateException("Missing resource on classpath: " + path);
+        }
+        System.out.println("[Avatar] Loaded from: " + url);
+        return new Image(url.toExternalForm());
+    }
 
     private static Image loadImageOrNull(String path) {
         try {
